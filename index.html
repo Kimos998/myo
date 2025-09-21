@@ -1,0 +1,157 @@
+<?php
+// snippets_tabs.php
+// صفحة واحدة PHP تعرض عدة "صفحات" منظمة في تبويبات مثل الصورة.
+// متطلبات: HTML, CSS, vanilla JavaScript, PHP فقط (لا JQuery، لا مكتبات خارجية)
+
+$tabs = [
+    'encours de livraison' => [
+        "Bonjour,\n\nVous n'avez toujours pas transmis de lien de suivi valide ou confirmant l'expédition du colis. Nous vous rappelons que vous avez 7 jours pour nous faire parvenir une preuve de livraison. A défaut, nous nous réservons le droit de procéder au remboursement de la commande.",
+        "Pour rappel, une preuve de livraison valable doit :\n- Provenir du transporteur utilisé.\n- Mentionner le nom du client et son adresse complète.\n- Indiquer la date de réception du colis par le client."
+    ],
+    'coli perdu' => [
+        "Bonjour,\n\nLe colis semble déclaré perdu par le transporteur. Merci de transmettre toute preuve disponible pour accélérer la réclamation.",
+        "Si aucune preuve n'est fournie, la demande de remboursement se fera selon nos CGV."
+    ],
+    'colis livre' => [
+        "Bonjour,\n\nSelon nos informations le colis a été livré. Si le client conteste, merci de transmettre une preuve (signature/photo).",
+        "En cas d'erreur de livraison, contactez le transporteur puis transmettez la preuve au support."
+    ],
+    'non expédie' => [
+        "Bonjour,\n\nLe colis n'a pas encore été expédié. Merci d'expédier et de communiquer le numéro de suivi.",
+        "Si vous ne pouvez pas expédier, annulez la commande ou contactez le support."
+    ]
+];
+?>
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Snippets - Onglets</title>
+    <style>
+        :root{ --muted:#dcd6d6; --panel:#f8f4f4; --accent:#111; }
+        body{ margin:0; font-family:Arial, Helvetica, sans-serif; background:#f0efef; }
+        .container{ padding:24px; }
+        /* header tabs similar to image */
+        .tabs{ display:flex; gap:0; background:var(--panel); border-top-left-radius:6px; border-top-right-radius:6px; overflow:hidden; box-shadow:inset 0 -1px 0 rgba(0,0,0,0.05); }
+        .tab{ flex:1; padding:22px 18px; text-align:center; font-weight:700; cursor:pointer; border-right:1px solid rgba(0,0,0,0.03); }
+        .tab:last-child{ border-right:0; }
+        .tab.active{ background:#efe9e9; }
+        .workspace{ background:var(--muted); padding:28px; min-height:540px; position:relative; }
+        .page-box{ width:78%; background:#fff; padding:22px; border-radius:4px; box-shadow:0 1px 0 rgba(0,0,0,0.06); margin-bottom:18px; }
+        .page-row{ display:flex; gap:20px; align-items:flex-start; }
+        .page-left{ flex:1; }
+        .page-right{ width:120px; display:flex; flex-direction:column; gap:18px; align-items:center; }
+        .icon-doc{ width:60px; height:60px; border:4px solid #111; border-radius:6px; display:flex; align-items:center; justify-content:center; }
+        .snippet{ background:#fff; padding:18px; border-radius:2px; border:1px solid #e8e3e3; position:relative; }
+        .snippet + .snippet{ margin-top:18px; }
+        .copy-single{ position:absolute; left:12px; top:12px; background:#111; color:#fff; border:0; padding:6px 8px; cursor:pointer; border-radius:4px; font-size:13px; }
+        .page-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .copy-all{ background:#111; color:#fff; border:0; padding:10px 14px; cursor:pointer; border-radius:6px; }
+        pre{ white-space:pre-wrap; word-break:break-word; margin:0; font-family:inherit; }
+        /* responsive */
+        @media (max-width:900px){ .page-box{ width:100%; } .page-right{ display:none; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tabs" role="tablist">
+        <?php $first=true; foreach ($tabs as $title => $snippets): ?>
+            <div class="tab <?php echo $first? 'active':'';?>" data-tab="<?php echo md5($title); ?>"><?php echo htmlspecialchars($title); ?></div>
+        <?php $first=false; endforeach; ?>
+    </div>
+
+    <div class="workspace">
+        <?php $first=true; foreach ($tabs as $title => $snippets): ?>
+            <section id="<?php echo md5($title); ?>" class="tab-content" style="display:<?php echo $first? 'block':'none'; ?>;">
+                <div class="page-row">
+                    <div class="page-left">
+                        <div class="page-box">
+                            <div class="page-header">
+                                <div style="font-weight:700; font-size:18px"><?php echo htmlspecialchars($title); ?></div>
+                                <button class="copy-all">نسخ الكل</button>
+                            </div>
+
+                            <?php foreach ($snippets as $sn): ?>
+                                <article class="snippet">
+                                    <button class="copy-single">نسخ</button>
+                                    <pre><?php echo htmlspecialchars($sn); ?></pre>
+                                </article>
+                            <?php endforeach; ?>
+
+                        </div>
+
+                        <!-- another smaller snippet below to mimic image layout -->
+                        <div class="page-box">
+                            <div class="snippet">
+                                <pre><?php echo htmlspecialchars($snippets[0]); ?></pre>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <aside class="page-right">
+                        <div class="icon-doc" aria-hidden="true">📄</div>
+                        <div class="icon-doc" aria-hidden="true">📄</div>
+                    </aside>
+                </div>
+            </section>
+        <?php $first=false; endforeach; ?>
+    </div>
+</div>
+
+<script>
+// vanilla JS: onglets + copy
+(function(){
+    // tabs
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function(t){
+        t.addEventListener('click', function(){
+            document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+            t.classList.add('active');
+            var id = t.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach(function(c){ c.style.display='none'; });
+            var target = document.getElementById(id);
+            if(target) target.style.display='block';
+            // scroll into view
+            target.scrollIntoView({behavior:'smooth', block:'center'});
+        });
+    });
+
+    // copy single
+    document.addEventListener('click', function(e){
+        if(e.target.matches('.copy-single')){
+            var pre = e.target.parentElement.querySelector('pre');
+            if(pre) copyText(pre.innerText, e.target);
+        }
+        if(e.target.matches('.copy-all')){
+            var box = e.target.closest('.page-box');
+            if(!box) return;
+            var texts = Array.prototype.slice.call(box.querySelectorAll('pre')).map(function(p){ return p.innerText; });
+            copyText(texts.join('\n\n---\n\n'), e.target);
+        }
+    });
+
+    function copyText(text, btn){
+        if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(text).then(function(){ flash(btn,true); }).catch(function(){ fallback(text,btn); });
+        } else fallback(text,btn);
+    }
+    function fallback(text, btn){
+        try{
+            var ta = document.createElement('textarea');
+            ta.style.position='fixed'; ta.style.left='-9999px'; ta.value = text; document.body.appendChild(ta); ta.select();
+            var ok = document.execCommand('copy'); document.body.removeChild(ta);
+            flash(btn, ok);
+        }catch(e){ flash(btn,false); }
+    }
+    function flash(btn, ok){
+        if(!btn) return;
+        var old = btn.textContent;
+        btn.textContent = ok? 'تم النسخ' : 'فشل النسخ';
+        setTimeout(function(){ btn.textContent = old; }, 1400);
+    }
+})();
+</script>
+</body>
+</html>
