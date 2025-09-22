@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor de Datos de Cdiscount</title>
+    <title>Visualiseur de Données Cdiscount</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
 
         body {
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Lato', sans-serif;
             background-color: #f0f2f5;
             margin: 0;
             padding: 20px;
@@ -128,7 +128,7 @@
 
         .card-body {
             padding: 15px;
-            white-space: pre-wrap; /* Keeps line breaks from the data */
+            white-space: pre-wrap; /* Conserve les sauts de ligne des données */
             font-size: 15px;
             line-height: 1.6;
             flex-grow: 1;
@@ -152,7 +152,7 @@
             </div>
 
         <div id="content-display">
-             <div id="loader">جار تحميل البيانات...</div>
+             <div id="loader">Chargement des données...</div>
         </div>
     </div>
 
@@ -166,36 +166,38 @@
         let allData = [];
         let categorizedData = {};
 
-        // Define main categories and keywords for classification
+        // Définir les catégories principales et les mots-clés pour la classification
         const categories = {
-            'قيد التوصيل': ['en cours de livraison'],
-            'طرد مفقود': ['pas de solution', 'livré sans preuve', 'colis absent', 'livre apres', 'rbt apres'],
-            'تم التوصيل': ['livré avec preuve', 'produit demt'],
-            'لم يتم الشحن': ['non expédiée', 'expédition non confirmée'],
-            'إدارة المطالبات': ['rbt relance vendeur', 'choix client réexpédition', 'commande rembourse', 'rbt ou rexp pas reponse', 'client choisir rexpe', 'client choisir remborsement']
+            'En cours de livraison': ['en cours de livraison'],
+            'Colis perdu': ['pas de solution', 'livré sans preuve', 'colis absent', 'livre apres', 'rbt apres'],
+            'Colis livré': ['livré avec preuve', 'produit demt'],
+            'Non expédié': ['non expédiée', 'expédition non confirmée'],
+            'Gestion réclamation': ['rbt relance vendeur', 'choix client réexpédition', 'commande rembourse', 'rbt ou rexp pas reponse', 'client choisir rexpe', 'client choisir remborsement']
         };
 
-        // Fetch and process data on page load
+        // Charger et traiter les données au chargement de la page
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch(DATA_URL);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`Erreur HTTP! statut: ${response.status}`);
                 }
                 allData = await response.json();
                 categorizeData();
                 renderMainTabs();
-                // Select the first tab by default
-                mainTabsContainer.querySelector('.tab-btn').click();
+                // Sélectionner le premier onglet par défaut
+                if (mainTabsContainer.querySelector('.tab-btn')) {
+                    mainTabsContainer.querySelector('.tab-btn').click();
+                }
                 loader.style.display = 'none';
             } catch (error) {
-                loader.textContent = 'فشل في تحميل البيانات. يرجى المحاولة مرة أخرى لاحقًا.';
-                console.error("Error fetching data:", error);
+                loader.textContent = 'Échec du chargement des données. Veuillez réessayer plus tard.';
+                console.error("Erreur lors du chargement des données:", error);
             }
         });
 
         function categorizeData() {
-            // Initialize categories
+            // Initialiser les catégories
             Object.keys(categories).forEach(cat => categorizedData[cat] = []);
 
             allData.forEach(item => {
@@ -209,11 +211,11 @@
                     }
                 }
                 if (!found && title !== 'untitled') {
-                    // Fallback for uncategorized items
-                    if (!categorizedData['أخرى']) {
-                        categorizedData['أخرى'] = [];
+                    // Catégorie par défaut pour les éléments non classés
+                    if (!categorizedData['Autres']) {
+                        categorizedData['Autres'] = [];
                     }
-                    categorizedData['أخرى'].push(item);
+                    categorizedData['Autres'].push(item);
                 }
             });
         }
@@ -251,19 +253,19 @@
                 };
                 subCategoriesContainer.appendChild(button);
             });
-            // Display first item of the category by default
-            if (items.length > 0) {
+            // Afficher le premier élément de la catégorie par défaut
+            if (items.length > 0 && subCategoriesContainer.querySelector('.sub-cat-btn')) {
                 subCategoriesContainer.querySelector('.sub-cat-btn').click();
             }
         }
         
         function renderContent(item) {
-            contentDisplay.innerHTML = ''; // Clear previous content
+            contentDisplay.innerHTML = ''; // Vider le contenu précédent
 
             const dataMap = {
-                'رسالة للعميل': item.client,
-                'رسالة للبائع': item.vendeur,
-                'الإجراء المطلوب': item.action
+                'Message pour le client': item.client,
+                'Message pour le vendeur': item.vendeur,
+                'Action requise': item.action
             };
 
             for (const [title, text] of Object.entries(dataMap)) {
@@ -279,7 +281,7 @@
                     
                     const copyButton = document.createElement('button');
                     copyButton.className = 'copy-btn';
-                    copyButton.textContent = 'نسخ';
+                    copyButton.textContent = 'Copier';
                     copyButton.onclick = () => copyToClipboard(text, copyButton);
                     
                     cardHeader.appendChild(headerTitle);
@@ -300,14 +302,14 @@
         function copyToClipboard(text, buttonElement) {
             navigator.clipboard.writeText(text).then(() => {
                 const originalText = buttonElement.textContent;
-                buttonElement.textContent = 'تم النسخ!';
+                buttonElement.textContent = 'Copié !';
                 buttonElement.classList.add('copied');
                 setTimeout(() => {
                     buttonElement.textContent = originalText;
                     buttonElement.classList.remove('copied');
                 }, 2000);
             }).catch(err => {
-                console.error('Failed to copy text: ', err);
+                console.error('Échec de la copie du texte: ', err);
             });
         }
 
