@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur de Données Cdiscount - Windows 11 Moderne</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variables CSS pour les couleurs */
+        :root {
+            --bg-color: #F3F6F9; /* Gris très clair, presque blanc */
+            --surface-color: #FFFFFF; /* Blanc pur pour les cartes et panneaux */
+            --border-color: #E0E0E0; /* Gris clair pour les bordures */
+            --text-color: #333333; /* Gris foncé pour le texte principal */
+            --subtle-text-color: #6C757D; /* Gris moyen pour le texte secondaire */
+            --accent-color: #0078D4; /* Bleu Windows 11 */
+            --accent-light: #EBF5FB; /* Bleu très clair */
+            --shadow-light: rgba(0, 0, 0, 0.08); /* Ombre très légère */
+            --shadow-medium: rgba(0, 0, 0, 0.12); /* Ombre un peu plus prononcée */
+            --border-radius: 8px; /* Rayon de bordure par défaut */
+        }
+
+        /* Réinitialisation de base */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif; /* Police moderne */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px; /* Largeur maximale pour les très grands écrans */
+            margin: 0 auto; /* Centrer le conteneur */
+            padding: 20px; /* Espacement autour du contenu */
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 15px; /* Espace entre les sections principales */
+        }
+
+        /* Onglets principaux */
+        .main-tabs {
+            display: flex;
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 4px var(--shadow-light);
+            flex-wrap: wrap;
+            padding: 0 10px; /* Padding interne pour les onglets */
+        }
+
+        .tab-btn {
+            flex-grow: 1;
+            padding: 12px 18px; /* Ajuster le padding */
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 16px;
+            font-weight: 500; /* Moins gras que le 700 */
+            color: var(--subtle-text-color);
+            transition: all 0.2s ease-in-out; /* Transitions douces */
+            border-bottom: 3px solid transparent;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+            background-color: var(--surface-color);
+            font-weight: 700;
+        }
+        
+        /* Sous-catégories */
+        .sub-categories {
+            padding: 15px 20px; /* Plus de padding */
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-top: none; /* Pas de bordure supérieure */
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 2px 4px var(--shadow-light);
+        }
+
+        .sub-cat-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            border-radius: 20px; /* Pilules pour les sous-catégories */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .sub-cat-btn:hover {
+            background-color: var(--accent-light);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .sub-cat-btn.active {
+            background-color: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        /* Contenu principal */
+        #content-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Adaptatif sur plusieurs colonnes */
+            gap: 20px;
+            flex-grow: 1; /* Permet de prendre l'espace restant */
+            padding: 0; /* Le padding sera sur les cards elles-mêmes */
+        }
+
+        .content-card {
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px var(--shadow-light); /* Ombre plus visible */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            background-color: var(--bg-color); /* Fond gris clair pour l'entête */
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            padding: 8px 18px;
+            font-size: 14px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px; /* Bords légèrement arrondis pour le bouton */
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056B3; /* Bleu plus foncé au survol */
+            box-shadow: 0 2px 8px var(--shadow-medium);
+        }
+        
+        .copy-btn.copied {
+            background-color: #28A745; /* Vert pour "copié" */
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+        }
+
+        .card-body {
+            padding: 20px; /* Plus de padding */
+            white-space: pre-wrap;
+            font-size: 15px;
+            line-height: 1.6;
+            flex-grow: 1;
+            color: var(--text-color);
+            background-color: var(--surface-color);
+            max-height: 250px; /* Ajuster selon le besoin, ou supprimer pour une hauteur flexible */
+            overflow-y: auto;
+        }
+        
+        #loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: var(--subtle-text-color);
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px var(--shadow-light);
+            grid-column: 1 / -1; /* Centrer le loader si les cartes sont en grid */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 10px;
+            }
+            .main-tabs, .sub-categories {
+                padding: 0 5px;
+            }
+            .tab-btn {
+                font-size: 14px;
+                min-width: 100px;
+                padding: 10px 12px;
+            }
+            .sub-categories {
+                padding: 10px;
+                gap: 8px;
+            }
+            .sub-cat-btn {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+            #content-display {
+                grid-template-columns: 1fr; /* Une seule colonne sur les petits écrans */
+                gap: 15px;
+            }
+            .card-header h3 {
+                font-size: 16px;
+            }
+            .copy-btn {
+                font-size: 13px;
+                padding: 6px 14px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-tabs" id="main-tabs">
+            </div>
+        
+        <div class="sub-categories" id="sub-categories">
+            </div>
+
+        <div id="content-display">
+             <div id="loader">Chargement des données...</div>
+        </div>
+    </div>
+
+    <script>
+        const DATA_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh_Iil-L_fprIljrn9pNVDBa0_Yg-U9r2kO7UM1AuP-iIuSBbi2AndMo3T2Xdx297wM7Rb3xZdQG_Si-Os005gBv3tWr5E003gV8T8S8HssXPZm055vlrsMj3VcSVy2teBmdkond_YUZK4-LUBdzCODoF2Gthd8HM4JjtcrmYw6_Cl0BnqZTVOc9G_HtbeT_-vOsVwHiEBlfz_ZD1vS4wR25LWKhK66sVcj8FQrK1DLZHudreiPWTVVMxGxu11zFapcMVwpPo7dU6OVgcX_RpunJQ5t4Q&lib=My-GJsg477MHoHZ8h_bfYZO-TjKIvX8ZV';
+        const mainTabsContainer = document.getElementById('main-tabs');
+        const subCategoriesContainer = document.getElementById('sub-categories');
+        const contentDisplay = document.getElementById('content-display');
+        const loader = document.getElementById('loader');
+
+        let allData = [];
+        let categorizedData = {};
+
+        // Nouvelle organisation des catégories avec les nouvelles entrées
+        const categories = {
+            'Problèmes d\'Expédition': [
+                "Non expédiée Pas de tracking",
+                "Expédition non confirmée"
+            ],
+            'Suivi de Livraison': [
+                "En cours de livraison",
+                "En cours de livraison (patienter)",
+                "colis en retour",
+                "si client patienter ", // Nouvelle entrée
+                "Rexpédition encours" // Nouvelle entrée
+            ],
+            'Problèmes de Réception': [
+                "Pas de solution",
+                "Livré sans preuve",
+                "colis absent du point relais",
+                "livre apres "
+            ],
+            'Livraison Confirmée': [
+                "Livré avec preuve",
+                "¨Produit DEMT"
+            ],
+            'Gestion des Litiges': [
+                "RBT ou Rexp pas reponse",
+                "choix client réexpédition",
+                "client choisir rexpe ",
+                "client choisir remborsement ",
+                "Réexpédition pas de lien",
+                "RBT relance vendeur",
+                "RBT apres",
+                "commande rembourse ",
+                "VDR ne repondre pas RBT", // Nouvelle entrée
+                "pas de solution apres 7j" // Nouvelle entrée
+            ]
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP! statut: ${response.status}`);
+                }
+                const text = await response.text();
+                const cleanedText = text.replace(/,"relance aucun solutio":""/g, ''); 
+                allData = JSON.parse(cleanedText);
+
+                categorizeData();
+                renderMainTabs();
+                if (mainTabsContainer.querySelector('.tab-btn')) {
+                    mainTabsContainer.querySelector('.tab-btn').click();
+                }
+                loader.style.display = 'none';
+            } catch (error) {
+                loader.textContent = 'Échec du chargement des données. Veuillez réessayer plus tard.';
+                console.error("Erreur lors du chargement des données:", error);
+            }
+        });
+
+        function categorizeData() {
+            Object.keys(categories).forEach(cat => categorizedData[cat] = []);
+            
+            const assignedItems = new Set();
+
+            for (const categoryName in categories) {
+                const titles = categories[categoryName];
+                titles.forEach(title => {
+                    allData.forEach(item => {
+                        if (item[""] && item[""].trim() === title.trim() && !assignedItems.has(item)) {
+                            categorizedData[categoryName].push(item);
+                            assignedItems.add(item);
+                        }
+                    });
+                });
+            }
+        }
+        
+        function renderMainTabs() {
+            mainTabsContainer.innerHTML = '';
+            Object.keys(categorizedData)
+                  .filter(categoryName => categorizedData[categoryName].length > 0)
+                  .sort()
+                  .forEach(categoryName => {
+                const button = document.createElement('button');
+                button.className = 'tab-btn';
+                button.textContent = categoryName;
+                button.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderSubCategories(categoryName);
+                };
+                mainTabsContainer.appendChild(button);
+            });
+        }
+
+        function renderSubCategories(categoryName) {
+            subCategoriesContainer.innerHTML = '';
+            contentDisplay.innerHTML = '';
+            const items = categorizedData[categoryName];
+            
+            items.sort((a, b) => a[""].localeCompare(b[""])).forEach(item => {
+                const button = document.createElement('button');
+                button.className = 'sub-cat-btn';
+                button.textContent = item[""];
+                button.onclick = () => {
+                    document.querySelectorAll('.sub-cat-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderContent(item);
+                };
+                subCategoriesContainer.appendChild(button);
+            });
+            if (items.length > 0 && subCategoriesContainer.querySelector('.sub-cat-btn')) {
+                subCategoriesContainer.querySelector('.sub-cat-btn').click();
+            }
+        }
+        
+        function renderContent(item) {
+            contentDisplay.innerHTML = '';
+
+            const dataMap = {
+                'Message pour le client': item.client,
+                'Message pour le vendeur': item.vendeur,
+                'Action requise': item.action
+            };
+
+            for (const [title, text] of Object.entries(dataMap)) {
+                if (text && text.trim() !== '') {
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header';
+                    
+                    const headerTitle = document.createElement('h3');
+                    headerTitle.textContent = title;
+                    
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-btn';
+                    copyButton.textContent = 'Copier';
+                    copyButton.onclick = () => copyToClipboard(text, copyButton);
+                    
+                    cardHeader.appendChild(headerTitle);
+                    cardHeader.appendChild(copyButton);
+
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    cardBody.textContent = text;
+                    
+                    card.appendChild(cardHeader);
+                    card.appendChild(cardBody);
+                    
+                    contentDisplay.appendChild(card);
+                }
+            }
+        }
+
+        function copyToClipboard(text, buttonElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copié !';
+                buttonElement.classList.add('copied');
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                    buttonElement.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Échec de la copie du texte: ', err);
+            });
+        }
+
+    </script>
+</body>
+</html>
