@@ -3,25 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualiseur de Données Cdiscount - Bloc-notes Style</title>
+    <title>Visualiseur de Données Cdiscount - Bloc-notes Style Plein Écran</title>
     <style>
         /* Réinitialisation de base */
+        html, body {
+            height: 100%; /* Important pour que le body puisse s'étirer */
+            margin: 0;
+            padding: 0; /* Supprime le padding du body */
+        }
+
         body {
             font-family: 'Lucida Console', 'Courier New', monospace; /* Police plus "monospace" pour un look old-school */
             background-color: #ECE9D8; /* Couleur de fond Windows classique */
-            margin: 0;
-            padding: 20px;
             color: #000;
             font-size: 14px;
+            display: flex; /* Utilise flexbox pour le layout global */
+            flex-direction: column;
         }
 
         .container {
-            max-width: 800px; /* Plus étroit pour un look de bloc-notes */
-            margin: 0 auto;
-            border: 1px solid #808080; /* Bordure grise classique */
-            background-color: #FFFFFF;
-            box-shadow: none; /* Pas d'ombre */
+            max-width: 100%; /* Utilise la largeur maximale */
+            width: 100%; /* Prend toute la largeur disponible */
+            margin: 0; /* Supprime les marges automatiques */
+            border: none; /* Supprime la bordure principale */
+            background-color: #ECE9D8; /* Fond du conteneur */
+            box-shadow: none;
+            flex-grow: 1; /* Permet au conteneur de prendre l'espace restant */
+            display: flex;
+            flex-direction: column;
         }
+        
+        /* Ajout d'un padding interne pour le contenu du conteneur si nécessaire */
+        .container > div {
+            padding: 10px; /* Ajoute un padding général aux sections internes */
+        }
+
 
         .main-tabs {
             display: flex;
@@ -31,6 +47,7 @@
             overflow: hidden;
             box-shadow: none;
             flex-wrap: wrap;
+            padding: 0 10px; /* Padding latéral pour les onglets */
         }
 
         .tab-btn {
@@ -52,7 +69,7 @@
         }
         
         .tab-btn:first-child {
-            margin-left: -1px; /* Correction de bordure pour le premier élément */
+            margin-left: 0; /* Correction de bordure pour le premier élément */
         }
 
 
@@ -78,7 +95,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: 5px; /* Moins d'espace */
-            margin-bottom: 10px; /* Espace après les sous-catégories */
+            margin: 0 10px 10px 10px; /* Marges pour l'ensemble des sous-catégories */
+            box-sizing: border-box; /* Inclure padding et border dans la largeur */
         }
 
         .sub-cat-btn {
@@ -103,12 +121,17 @@
         }
 
         #content-display {
-            margin-top: 0; /* Supprime l'espace supérieur */
+            margin: 0 10px 10px 10px; /* Marges pour l'ensemble du contenu */
             padding: 10px;
             display: grid;
-            grid-template-columns: 1fr; /* Une seule colonne pour un look bloc-notes */
+            /* Utilisation de auto-fit pour adapter les colonnes à la largeur de l'écran */
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
             gap: 15px; /* Espace entre les cartes */
             background-color: #FFFFFF;
+            border: 1px solid #808080; /* Bordure autour de la zone de contenu */
+            flex-grow: 1; /* Permet à la zone de contenu de prendre l'espace restant */
+            overflow-y: auto; /* Permet le défilement si le contenu dépasse la hauteur */
+            box-sizing: border-box;
         }
 
         .content-card {
