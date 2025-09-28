@@ -1,1 +1,362 @@
-x
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur de Données Cdiscount</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .main-tabs {
+            display: flex;
+            background-color: #e9e9e9;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex-grow: 1;
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 16px;
+            font-weight: 700;
+            color: #555;
+            transition: background-color 0.3s, color 0.3s;
+            border-bottom: 3px solid transparent;
+            min-width: 150px; /* Pour éviter que les onglets ne soient trop étroits */
+        }
+
+        .tab-btn:hover {
+            background-color: #dcdcdc;
+        }
+
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        
+        .sub-categories {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-top: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sub-cat-btn {
+            padding: 8px 15px;
+            border: 1px solid #007bff;
+            background-color: #fff;
+            color: #007bff;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+        }
+        
+        .sub-cat-btn:hover, .sub-cat-btn.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        #content-display {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .content-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 15px;
+            background-color: #f7f7f7;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .copy-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .copy-btn.copied {
+            background-color: #28a745;
+        }
+
+        .card-body {
+            padding: 15px;
+            white-space: pre-wrap; /* Conserve les sauts de ligne des données */
+            font-size: 15px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+        
+        #loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-tabs" id="main-tabs">
+            </div>
+        
+        <div class="sub-categories" id="sub-categories">
+            </div>
+
+        <div id="content-display">
+             <div id="loader">Chargement des données...</div>
+        </div>
+    </div>
+
+    <script>
+        const DATA_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh_Iil-L_fprIljrn9pNVDBa0_Yg-U9r2kO7UM1AuP-iIuSBbi2AndMo3T2Xdx297wM7Rb3xZdQG_Si-Os005gBv3tWr5E003gV8T8S8HssXPZm055vlrsMj3VcSVy2teBmdkond_YUZK4-LUBdzCODoF2Gthd8HM4JjtcrmYw6_Cl0BnqZTVOc9G_HtbeT_-vOsVwHiEBlfz_ZD1vS4wR25LWKhK66sVcj8FQrK1DLZHudreiPWTVVMxGxu11zFapcMVwpPo7dU6OVgcX_RpunJQ5t4Q&lib=My-GJsg477MHoHZ8h_bfYZO-TjKIvX8ZV';
+        const mainTabsContainer = document.getElementById('main-tabs');
+        const subCategoriesContainer = document.getElementById('sub-categories');
+        const contentDisplay = document.getElementById('content-display');
+        const loader = document.getElementById('loader');
+
+        let allData = [];
+        let categorizedData = {};
+
+        // Nouvelle organisation des catégories avec les nouvelles entrées
+        const categories = {
+            'Problèmes d\'Expédition': [
+                "Non expédiée Pas de tracking",
+                "Expédition non confirmée"
+            ],
+            'Suivi de Livraison': [
+                "En cours de livraison",
+                "En cours de livraison (patienter)",
+                "colis en retour",
+                "si client patienter ", // Nouvelle entrée
+                "Rexpédition encours" // Nouvelle entrée
+            ],
+            'Problèmes de Réception': [
+                "Pas de solution",
+                "Livré sans preuve",
+                "colis absent du point relais",
+                "livre apres "
+            ],
+            'Livraison Confirmée': [
+                "Livré avec preuve",
+                "¨Produit DEMT"
+            ],
+            'Gestion des Litiges': [
+                "RBT ou Rexp pas reponse",
+                "choix client réexpédition",
+                "client choisir rexpe ",
+                "client choisir remborsement ",
+                "Réexpédition pas de lien",
+                "RBT relance vendeur",
+                "RBT apres",
+                "commande rembourse ",
+                "VDR ne repondre pas RBT", // Nouvelle entrée
+                "pas de solution apres 7j" // Nouvelle entrée
+            ]
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP! statut: ${response.status}`);
+                }
+                const text = await response.text();
+                // Assurez-vous que cette ligne est correcte si d'autres nettoyages sont nécessaires
+                const cleanedText = text.replace(/,"relance aucun solutio":""/g, ''); // Garde le nettoyage existant
+                allData = JSON.parse(cleanedText);
+
+                categorizeData();
+                renderMainTabs();
+                if (mainTabsContainer.querySelector('.tab-btn')) {
+                    mainTabsContainer.querySelector('.tab-btn').click();
+                }
+                loader.style.display = 'none';
+            } catch (error) {
+                loader.textContent = 'Échec du chargement des données. Veuillez réessayer plus tard.';
+                console.error("Erreur lors du chargement des données:", error);
+            }
+        });
+
+        function categorizeData() {
+            // Initialise categorizedData avec toutes les catégories définies
+            Object.keys(categories).forEach(cat => categorizedData[cat] = []);
+            
+            // Map pour garder une trace des éléments déjà assignés
+            const assignedItems = new Set();
+
+            // Parcourt chaque catégorie définie
+            for (const categoryName in categories) {
+                const titles = categories[categoryName]; // Titres attendus pour cette catégorie
+                titles.forEach(title => {
+                    // Parcourt toutes les données pour trouver les correspondances
+                    allData.forEach(item => {
+                        // Si l'élément correspond au titre et n'a pas encore été assigné
+                        if (item[""] && item[""].trim() === title.trim() && !assignedItems.has(item)) {
+                            categorizedData[categoryName].push(item);
+                            assignedItems.add(item); // Marque l'élément comme assigné
+                        }
+                    });
+                });
+            }
+            
+            // Gestion des éléments non catégorisés (optionnel, mais bonne pratique)
+            // allData.forEach(item => {
+            //     if (!assignedItems.has(item)) {
+            //         console.warn(`Item non catégorisé: ${item[""]}`);
+            //         // Vous pouvez ajouter une catégorie "Autres" si vous voulez afficher ces éléments
+            //         // if (!categorizedData['Autres']) categorizedData['Autres'] = [];
+            //         // categorizedData['Autres'].push(item);
+            //     }
+            // });
+        }
+        
+        function renderMainTabs() {
+            mainTabsContainer.innerHTML = '';
+            // Filtre et trie les catégories qui ont des données
+            Object.keys(categorizedData)
+                  .filter(categoryName => categorizedData[categoryName].length > 0)
+                  .sort() // Trie les onglets par ordre alphabétique
+                  .forEach(categoryName => {
+                const button = document.createElement('button');
+                button.className = 'tab-btn';
+                button.textContent = categoryName;
+                button.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderSubCategories(categoryName);
+                };
+                mainTabsContainer.appendChild(button);
+            });
+        }
+
+        function renderSubCategories(categoryName) {
+            subCategoriesContainer.innerHTML = '';
+            contentDisplay.innerHTML = '';
+            const items = categorizedData[categoryName];
+            
+            // Trie les sous-catégories par ordre alphabétique de leur titre
+            items.sort((a, b) => a[""].localeCompare(b[""])).forEach(item => {
+                const button = document.createElement('button');
+                button.className = 'sub-cat-btn';
+                button.textContent = item[""];
+                button.onclick = () => {
+                    document.querySelectorAll('.sub-cat-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderContent(item);
+                };
+                subCategoriesContainer.appendChild(button);
+            });
+            // Clique sur la première sous-catégorie si elle existe
+            if (items.length > 0 && subCategoriesContainer.querySelector('.sub-cat-btn')) {
+                subCategoriesContainer.querySelector('.sub-cat-btn').click();
+            }
+        }
+        
+        function renderContent(item) {
+            contentDisplay.innerHTML = '';
+
+            const dataMap = {
+                'Message pour le client': item.client,
+                'Message pour le vendeur': item.vendeur,
+                'Action requise': item.action
+            };
+
+            for (const [title, text] of Object.entries(dataMap)) {
+                if (text && text.trim() !== '') {
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header';
+                    
+                    const headerTitle = document.createElement('h3');
+                    headerTitle.textContent = title;
+                    
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-btn';
+                    copyButton.textContent = 'Copier';
+                    copyButton.onclick = () => copyToClipboard(text, copyButton);
+                    
+                    cardHeader.appendChild(headerTitle);
+                    cardHeader.appendChild(copyButton);
+
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    cardBody.textContent = text;
+                    
+                    card.appendChild(cardHeader);
+                    card.appendChild(cardBody);
+                    
+                    contentDisplay.appendChild(card);
+                }
+            }
+        }
+
+        function copyToClipboard(text, buttonElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copié !';
+                buttonElement.classList.add('copied');
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                    buttonElement.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Échec de la copie du texte: ', err);
+            });
+        }
+
+    </script>
+</body>
+</html>
