@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur de Données Cdiscount - Bloc-notes Style</title>
+    <style>
+        /* Réinitialisation de base */
+        body {
+            font-family: 'Lucida Console', 'Courier New', monospace; /* Police plus "monospace" pour un look old-school */
+            background-color: #ECE9D8; /* Couleur de fond Windows classique */
+            margin: 0;
+            padding: 20px;
+            color: #000;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 800px; /* Plus étroit pour un look de bloc-notes */
+            margin: 0 auto;
+            border: 1px solid #808080; /* Bordure grise classique */
+            background-color: #FFFFFF;
+            box-shadow: none; /* Pas d'ombre */
+        }
+
+        .main-tabs {
+            display: flex;
+            background-color: #ECE9D8; /* Fond gris clair */
+            border-bottom: 1px solid #808080; /* Bordure simple */
+            border-radius: 0; /* Pas d'arrondis */
+            overflow: hidden;
+            box-shadow: none;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex-grow: 1;
+            padding: 8px 15px; /* Moins de padding */
+            cursor: pointer;
+            border: 1px solid #808080; /* Bordure pour les onglets */
+            border-bottom: none; /* Pas de bordure en bas pour le non-actif */
+            background-color: #C0C0C0; /* Couleur de bouton gris inactif */
+            font-size: 14px;
+            font-weight: normal; /* Pas de gras */
+            color: #000;
+            transition: none; /* Pas de transition pour un look instantané */
+            min-width: 100px; /* Moins large */
+            margin-right: -1px; /* Pour que les bordures se touchent */
+            margin-bottom: -1px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tab-btn:first-child {
+            margin-left: -1px; /* Correction de bordure pour le premier élément */
+        }
+
+
+        .tab-btn:hover {
+            background-color: #D4D0C8; /* Légèrement plus clair au survol */
+        }
+
+        .tab-btn.active {
+            color: #000;
+            background-color: #FFFFFF; /* Blanc pour l'onglet actif */
+            border-bottom-color: #FFFFFF; /* Cache la bordure inférieure pour l'onglet actif */
+            z-index: 2; /* Pour passer par-dessus la bordure basse du conteneur */
+            border-top: 1px solid #808080;
+            border-left: 1px solid #808080;
+            border-right: 1px solid #808080;
+        }
+        
+        .sub-categories {
+            padding: 10px; /* Moins de padding */
+            background-color: #ECE9D8; /* Fond gris clair */
+            border: 1px solid #808080; /* Bordure simple */
+            border-top: none; /* Pas de bordure supérieure */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; /* Moins d'espace */
+            margin-bottom: 10px; /* Espace après les sous-catégories */
+        }
+
+        .sub-cat-btn {
+            padding: 5px 10px; /* Moins de padding */
+            border: 1px solid #808080; /* Bordure simple */
+            background-color: #C0C0C0; /* Fond gris bouton */
+            color: #000;
+            border-radius: 0; /* Pas d'arrondis */
+            cursor: pointer;
+            transition: none;
+            font-size: 13px;
+            box-shadow: 1px 1px 0px #FFFFFF inset, -1px -1px 0px #808080 inset; /* Effet 3D léger */
+        }
+        
+        .sub-cat-btn:hover {
+            background-color: #D4D0C8;
+        }
+        
+        .sub-cat-btn.active {
+            background-color: #D4D0C8; /* Fond légèrement plus clair quand actif */
+            box-shadow: 1px 1px 0px #808080 inset, -1px -1px 0px #FFFFFF inset; /* Effet 3D enfoncé */
+        }
+
+        #content-display {
+            margin-top: 0; /* Supprime l'espace supérieur */
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr; /* Une seule colonne pour un look bloc-notes */
+            gap: 15px; /* Espace entre les cartes */
+            background-color: #FFFFFF;
+        }
+
+        .content-card {
+            background-color: #FFFFFF;
+            border-radius: 0; /* Pas d'arrondis */
+            box-shadow: none;
+            border: 1px solid #808080; /* Bordure simple */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 8px 10px; /* Moins de padding */
+            background-color: #C0C0C0; /* Fond gris */
+            border-bottom: 1px solid #808080; /* Bordure simple */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-size: 15px;
+            color: #000;
+            font-weight: bold; /* Titre en gras */
+        }
+
+        .copy-btn {
+            padding: 3px 8px; /* Moins de padding */
+            font-size: 12px;
+            background-color: #C0C0C0; /* Fond gris bouton */
+            color: #000;
+            border: 1px solid #808080; /* Bordure simple */
+            border-radius: 0; /* Pas d'arrondis */
+            cursor: pointer;
+            transition: none;
+            box-shadow: 1px 1px 0px #FFFFFF inset, -1px -1px 0px #808080 inset; /* Effet 3D léger */
+        }
+
+        .copy-btn:hover {
+            background-color: #D4D0C8;
+        }
+        
+        .copy-btn.copied {
+            background-color: #A0C0A0; /* Couleur verte pour "copié" */
+            box-shadow: 1px 1px 0px #808080 inset, -1px -1px 0px #FFFFFF inset; /* Effet 3D enfoncé */
+        }
+
+        .card-body {
+            padding: 10px; /* Moins de padding */
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.5;
+            flex-grow: 1;
+            background-color: #FFFFFF; /* Fond blanc pour le texte */
+            border: none; /* Pas de bordure interne */
+            overflow-y: auto; /* Permettre le défilement si le contenu est trop long */
+            max-height: 200px; /* Limite la hauteur pour un look bloc-notes */
+        }
+        
+        #loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 14px;
+            background-color: #FFFFFF;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-tabs" id="main-tabs">
+            </div>
+        
+        <div class="sub-categories" id="sub-categories">
+            </div>
+
+        <div id="content-display">
+             <div id="loader">Chargement des données...</div>
+        </div>
+    </div>
+
+    <script>
+        const DATA_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh_Iil-L_fprIljrn9pNVDBa0_Yg-U9r2kO7UM1AuP-iIuSBbi2AndMo3T2Xdx297wM7Rb3xZdQG_Si-Os005gBv3tWr5E003gV8T8S8HssXPZm055vlrsMj3VcSVy2teBmdkond_YUZK4-LUBdzCODoF2Gthd8HM4JjtcrmYw6_Cl0BnqZTVOc9G_HtbeT_-vOsVwHiEBlfz_ZD1vS4wR25LWKhK66sVcj8FQrK1DLZHudreiPWTVVMxGxu11zFapcMVwpPo7dU6OVgcX_RpunJQ5t4Q&lib=My-GJsg477MHoHZ8h_bfYZO-TjKIvX8ZV';
+        const mainTabsContainer = document.getElementById('main-tabs');
+        const subCategoriesContainer = document.getElementById('sub-categories');
+        const contentDisplay = document.getElementById('content-display');
+        const loader = document.getElementById('loader');
+
+        let allData = [];
+        let categorizedData = {};
+
+        // Nouvelle organisation des catégories avec les nouvelles entrées
+        const categories = {
+            'Problèmes d\'Expédition': [
+                "Non expédiée Pas de tracking",
+                "Expédition non confirmée"
+            ],
+            'Suivi de Livraison': [
+                "En cours de livraison",
+                "En cours de livraison (patienter)",
+                "colis en retour",
+                "si client patienter ", // Nouvelle entrée
+                "Rexpédition encours" // Nouvelle entrée
+            ],
+            'Problèmes de Réception': [
+                "Pas de solution",
+                "Livré sans preuve",
+                "colis absent du point relais",
+                "livre apres "
+            ],
+            'Livraison Confirmée': [
+                "Livré avec preuve",
+                "¨Produit DEMT"
+            ],
+            'Gestion des Litiges': [
+                "RBT ou Rexp pas reponse",
+                "choix client réexpédition",
+                "client choisir rexpe ",
+                "client choisir remborsement ",
+                "Réexpédition pas de lien",
+                "RBT relance vendeur",
+                "RBT apres",
+                "commande rembourse ",
+                "VDR ne repondre pas RBT", // Nouvelle entrée
+                "pas de solution apres 7j" // Nouvelle entrée
+            ]
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP! statut: ${response.status}`);
+                }
+                const text = await response.text();
+                // Assurez-vous que cette ligne est correcte si d'autres nettoyages sont nécessaires
+                const cleanedText = text.replace(/,"relance aucun solutio":""/g, ''); // Garde le nettoyage existant
+                allData = JSON.parse(cleanedText);
+
+                categorizeData();
+                renderMainTabs();
+                if (mainTabsContainer.querySelector('.tab-btn')) {
+                    mainTabsContainer.querySelector('.tab-btn').click();
+                }
+                loader.style.display = 'none';
+            } catch (error) {
+                loader.textContent = 'Échec du chargement des données. Veuillez réessayer plus tard.';
+                console.error("Erreur lors du chargement des données:", error);
+            }
+        });
+
+        function categorizeData() {
+            Object.keys(categories).forEach(cat => categorizedData[cat] = []);
+            
+            const assignedItems = new Set();
+
+            for (const categoryName in categories) {
+                const titles = categories[categoryName];
+                titles.forEach(title => {
+                    allData.forEach(item => {
+                        if (item[""] && item[""].trim() === title.trim() && !assignedItems.has(item)) {
+                            categorizedData[categoryName].push(item);
+                            assignedItems.add(item);
+                        }
+                    });
+                });
+            }
+        }
+        
+        function renderMainTabs() {
+            mainTabsContainer.innerHTML = '';
+            Object.keys(categorizedData)
+                  .filter(categoryName => categorizedData[categoryName].length > 0)
+                  .sort()
+                  .forEach(categoryName => {
+                const button = document.createElement('button');
+                button.className = 'tab-btn';
+                button.textContent = categoryName;
+                button.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderSubCategories(categoryName);
+                };
+                mainTabsContainer.appendChild(button);
+            });
+        }
+
+        function renderSubCategories(categoryName) {
+            subCategoriesContainer.innerHTML = '';
+            contentDisplay.innerHTML = '';
+            const items = categorizedData[categoryName];
+            
+            items.sort((a, b) => a[""].localeCompare(b[""])).forEach(item => {
+                const button = document.createElement('button');
+                button.className = 'sub-cat-btn';
+                button.textContent = item[""];
+                button.onclick = () => {
+                    document.querySelectorAll('.sub-cat-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderContent(item);
+                };
+                subCategoriesContainer.appendChild(button);
+            });
+            if (items.length > 0 && subCategoriesContainer.querySelector('.sub-cat-btn')) {
+                subCategoriesContainer.querySelector('.sub-cat-btn').click();
+            }
+        }
+        
+        function renderContent(item) {
+            contentDisplay.innerHTML = '';
+
+            const dataMap = {
+                'Message pour le client': item.client,
+                'Message pour le vendeur': item.vendeur,
+                'Action requise': item.action
+            };
+
+            for (const [title, text] of Object.entries(dataMap)) {
+                if (text && text.trim() !== '') {
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header';
+                    
+                    const headerTitle = document.createElement('h3');
+                    headerTitle.textContent = title;
+                    
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-btn';
+                    copyButton.textContent = 'Copier';
+                    copyButton.onclick = () => copyToClipboard(text, copyButton);
+                    
+                    cardHeader.appendChild(headerTitle);
+                    cardHeader.appendChild(copyButton);
+
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    cardBody.textContent = text;
+                    
+                    card.appendChild(cardHeader);
+                    card.appendChild(cardBody);
+                    
+                    contentDisplay.appendChild(card);
+                }
+            }
+        }
+
+        function copyToClipboard(text, buttonElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copié !';
+                buttonElement.classList.add('copied');
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                    buttonElement.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Échec de la copie du texte: ', err);
+            });
+        }
+
+    </script>
+</body>
+</html>
