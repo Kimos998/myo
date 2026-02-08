@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur de Données Cdiscount</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .main-tabs {
+            display: flex;
+            background-color: #e9e9e9;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex-grow: 1;
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 700;
+            color: #555;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            min-width: 150px;
+        }
+
+        .tab-btn:hover { background-color: #dcdcdc; }
+        .tab-btn.active { color: #007bff; border-bottom-color: #007bff; }
+
+        .sub-categories {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-top: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sub-cat-btn {
+            padding: 8px 15px;
+            border: 1px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .sub-cat-btn:hover, .sub-cat-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        #content-display {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 15px;
+            background: #f7f7f7;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 { margin: 0; font-size: 18px; color: #333; }
+
+        .copy-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover { background: #0056b3; }
+        .copy-btn.copied { background: #28a745; }
+
+        .card-body {
+            padding: 15px;
+            white-space: pre-wrap;
+            font-size: 15px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        #loader { text-align: center; padding: 50px; font-size: 18px; }
+
+        /* Formulaire nouveau cas */
+        #new-case-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        #new-case-form h2 { margin-top: 0; color: #007bff; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        #save-new-case {
+            padding: 12px 24px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #save-new-case:hover { background: #218838; }
+
+        #form-message {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        .success { color: #28a745; }
+        .error   { color: #dc3545; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="main-tabs" id="main-tabs"></div>
+
+    <div class="sub-categories" id="sub-categories"></div>
+
+    <div id="content-display">
+        <div id="loader">Chargement des données...</div>
+    </div>
+</div>
+
+<script>
+// ────────────────────────────────────────────────
+// CONFIGURATION & STORAGE COMPATIBILITY
+// ────────────────────────────────────────────────
+
+const DATA_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh_Iil-L_fprIljrn9pNVDBa0_Yg-U9r2kO7UM1AuP-iIuSBbi2AndMo3T2Xdx297wM7Rb3xZdQG_Si-Os005gBv3tWr5E003gV8T8S8HssXPZm055vlrsMj3VcSVy2teBmdkond_YUZK4-LUBdzCODoF2Gthd8HM4JjtcrmYw6_Cl0BnqZTVOc9G_HtbeT_-vOsVwHiEBlfz_ZD1vS4wR25LWKhK66sVcj8FQrK1DLZHudreiPWTVVMxGxu11zFapcMVwpPo7dU6OVgcX_RpunJQ5t4Q&lib=My-GJsg477MHoHZ8h_bfYZO-TjKIvX8ZV';
+
+const categories = {
+    'Problèmes d\'Expédition': [
+        "Non expédiée Pas de tracking",
+        "Expédition non confirmée"
+    ],
+    'Suivi de Livraison': [
+        "En cours de livraison",
+        "En cours de livraison (patienter)",
+        "colis en retour",
+        "si client patienter ",
+        "Rexpédition encours"
+    ],
+    'Problèmes de Réception': [
+        "Pas de solution",
+        "Livré sans preuve",
+        "colis absent du point relais",
+        "livre apres "
+    ],
+    'Livraison Confirmée': [
+        "Livré avec preuve",
+        "¨Produit DEMT"
+    ],
+    'Gestion des Litiges': [
+        "RBT ou Rexp pas reponse",
+        "choix client réexpédition",
+        "client choisir rexpe ",
+        "client choisir remborsement ",
+        "Réexpédition pas de lien",
+        "RBT relance vendeur",
+        "RBT apres",
+        "commande rembourse ",
+        "VDR ne repondre pas RBT",
+        "pas de solution apres 7j"
+    ],
+    'À rajouter / Nouvelles situations': []
+};
+
+let allData = [];
+let categorizedData = {};
+let canUseLocalStorage = false;
+let customCases = [];
+
+// Test localStorage availability
+try {
+    const testKey = '__storage_test__';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    canUseLocalStorage = true;
+    customCases = JSON.parse(localStorage.getItem('customCdiscountCases') || '[]');
+} catch (e) {
+    console.warn("localStorage non disponible (sandbox/file://) → stockage temporaire en mémoire");
+    customCases = window.tempCustomCases || [];
+}
+
+// ────────────────────────────────────────────────
+// CHARGEMENT DONNÉES + INIT
+// ────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const loader = document.getElementById('loader');
+    try {
+        const response = await fetch(DATA_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const text = await response.text();
+        const cleaned = text.replace(/,"relance aucun solutio":""/g, '');
+        allData = JSON.parse(cleaned);
+
+        categorizeData();
+        loadCustomCases();
+        renderMainTabs();
+
+        const firstTab = document.querySelector('.tab-btn');
+        if (firstTab) firstTab.click();
+
+        loader.style.display = 'none';
+    } catch (err) {
+        loader.textContent = 'Échec du chargement des données.';
+        console.error(err);
+    }
+});
+
+function categorizeData() {
+    Object.keys(categories).forEach(cat => categorizedData[cat] = []);
+    const assigned = new Set();
+
+    for (const catName in categories) {
+        if (catName === 'À rajouter / Nouvelles situations') continue;
+
+        categories[catName].forEach(title => {
+            allData.forEach(item => {
+                if (item[""]?.trim() === title.trim() && !assigned.has(item)) {
+                    categorizedData[catName].push(item);
+                    assigned.add(item);
+                }
+            });
+        });
+    }
+}
+
+function loadCustomCases() {
+    customCases.forEach(c => {
+        categorizedData['À rajouter / Nouvelles situations'].push({
+            "": c.title,
+            client: c.client || '',
+            vendeur: c.vendeur || '',
+            action: c.action || ''
+        });
+    });
+}
+
+// ────────────────────────────────────────────────
+// RENDU ONGLETS PRINCIPAUX
+// ────────────────────────────────────────────────
+
+function renderMainTabs() {
+    const container = document.getElementById('main-tabs');
+    container.innerHTML = '';
+
+    Object.keys(categorizedData)
+        .filter(cat => categorizedData[cat].length > 0 || cat === 'À rajouter / Nouvelles situations')
+        .sort()
+        .forEach(catName => {
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn';
+            btn.textContent = catName;
+            btn.onclick = () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderSubCategories(catName);
+            };
+            container.appendChild(btn);
+        });
+}
+
+// ────────────────────────────────────────────────
+// RENDU SOUS-CATÉGORIES + FORMULAIRE
+// ────────────────────────────────────────────────
+
+function renderSubCategories(categoryName) {
+    const subCont = document.getElementById('sub-categories');
+    const content = document.getElementById('content-display');
+    subCont.innerHTML = '';
+    content.innerHTML = '';
+
+    if (categoryName === 'À rajouter / Nouvelles situations') {
+        const formCard = document.createElement('div');
+        formCard.innerHTML = `
+            <div id="new-case-form">
+                <h2>Ajouter une nouvelle situation</h2>
+                <div class="form-group">
+                    <label>Titre du cas</label>
+                    <input type="text" id="new-title" placeholder="ex: Colis bloqué douane Espagne" required>
+                </div>
+                <div class="form-group">
+                    <label>Message pour le client</label>
+                    <textarea id="new-client" placeholder="Bonjour,\nSuite à votre commande..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Message pour le vendeur</label>
+                    <textarea id="new-vendeur" placeholder="Bonjour,\nConcernant la commande..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Action requise</label>
+                    <textarea id="new-action" placeholder="Vérifier statut douane\nContacter le transporteur..."></textarea>
+                </div>
+                <button id="save-new-case">Enregistrer ce cas</button>
+                <div id="form-message"></div>
+            </div>
+        `;
+        content.appendChild(formCard);
+
+        document.getElementById('save-new-case').onclick = saveNewCase;
+    }
+
+    const items = categorizedData[categoryName] || [];
+    items.sort((a,b) => a[""].localeCompare(b[""] || ''));
+
+    items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'sub-cat-btn';
+        btn.textContent = item[""] || '(sans titre)';
+        btn.onclick = () => {
+            document.querySelectorAll('.sub-cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderContent(item);
+        };
+        subCont.appendChild(btn);
+    });
+
+    if (items.length > 0) {
+        subCont.querySelector('.sub-cat-btn')?.click();
+    }
+}
+
+// ────────────────────────────────────────────────
+// SAUVEGARDE NOUVEAU CAS
+// ────────────────────────────────────────────────
+
+function saveNewCase() {
+    const title   = document.getElementById('new-title')?.value.trim();
+    const client  = document.getElementById('new-client')?.value.trim();
+    const vendeur = document.getElementById('new-vendeur')?.value.trim();
+    const action  = document.getElementById('new-action')?.value.trim();
+    const msgEl   = document.getElementById('form-message');
+
+    if (!title) {
+        msgEl.textContent = "Le titre est obligatoire !";
+        msgEl.className = "error";
+        return;
+    }
+
+    const newCase = { title, client, vendeur, action };
+    customCases.push(newCase);
+
+    if (canUseLocalStorage) {
+        localStorage.setItem('customCdiscountCases', JSON.stringify(customCases));
+    } else {
+        window.tempCustomCases = customCases;
+    }
+
+    // Mise à jour immédiate de l'interface
+    categorizedData['À rajouter / Nouvelles situations'].push({
+        "": title,
+        client, vendeur, action
+    });
+
+    msgEl.textContent = canUseLocalStorage
+        ? "Cas enregistré (persistant dans le navigateur)"
+        : "Cas enregistré temporairement (disparaît au rechargement)";
+    msgEl.className = "success";
+
+    // Rafraîchir sous-catégories
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab?.textContent === 'À rajouter / Nouvelles situations') {
+        renderSubCategories('À rajouter / Nouvelles situations');
+    }
+
+    // Vider formulaire
+    ['new-title','new-client','new-vendeur','new-action'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+}
+
+// ────────────────────────────────────────────────
+// AFFICHAGE CONTENU
+// ────────────────────────────────────────────────
+
+function renderContent(item) {
+    const display = document.getElementById('content-display');
+    display.innerHTML = '';
+
+    const dataMap = {
+        'Message pour le client': item.client,
+        'Message pour le vendeur': item.vendeur,
+        'Action requise': item.action
+    };
+
+    for (const [title, text] of Object.entries(dataMap)) {
+        if (!text?.trim()) continue;
+
+        const card = document.createElement('div');
+        card.className = 'content-card';
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+
+        const h3 = document.createElement('h3');
+        h3.textContent = title;
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copier';
+        copyBtn.onclick = () => copyToClipboard(text, copyBtn);
+
+        header.appendChild(h3);
+        header.appendChild(copyBtn);
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        body.textContent = text;
+
+        card.appendChild(header);
+        card.appendChild(body);
+        display.appendChild(card);
+    }
+}
+
+function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.textContent = orig;
+            btn.classList.remove('copied');
+        }, 2000);
+    }).catch(err => console.error('Échec copie', err));
+}
+</script>
+</body>
+</html>
