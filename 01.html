@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes Service Client – Toutes les notes</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f7fa; color: #333; margin: 0; padding: 20px; line-height: 1.55; }
+    h1 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+    details { margin: 12px 0; border: 1px solid #d0d8e0; border-radius: 7px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    summary { padding: 14px 18px; background: #e8f0f8; cursor: pointer; font-weight: bold; font-size: 1.05em; color: #34495e; }
+    .category { padding: 12px 18px; }
+    .note-item { 
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; margin: 10px 0; 
+      padding: 12px 14px; position: relative; min-height: 80px;
+    }
+    .note-text { white-space: pre-wrap; word-break: break-word; margin: 0 0 8px 0; padding-right: 130px; font-size: 0.96em; }
+    .input-group { display: flex; flex-wrap: wrap; gap: 12px 18px; margin: 8px 0; }
+    .input-group label { color: #555; font-size: 0.9em; white-space: nowrap; padding-top: 5px; }
+    .input-group input { 
+      width: 120px; padding: 5px 8px; border: 1px solid #bbb; border-radius: 4px; 
+      font-family: monospace; font-size: 0.95em;
+    }
+    .copy-btn { 
+      position: absolute; top: 12px; right: 12px; padding: 8px 14px; 
+      background: #2c7be5; color: white; border: none; border-radius: 5px; 
+      cursor: pointer; font-size: 0.92em; transition: 0.2s;
+    }
+    .copy-btn:hover { background: #1a68d1; }
+    .copy-btn.copied { background: #28a745; }
+    footer { text-align: center; margin-top: 40px; color: #7f8c8d; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+
+<h1>Notes Service Client – Toutes les notes uniques</h1>
+
+<details open>
+  <summary>1. Remboursement immédiat – Vendeur / VDR suspect</summary>
+  <div class="category">
+    <div class="note-item" data-template="valeur PDT ko // VDR suspect je rembourse RBT ok suite VDR suspect">
+      <p class="note-text">valeur PDT ko // VDR suspect je rembourse RBT ok suite VDR suspect</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="VDR suspect je rembourse RBT ok suite VDR suspect ------------------!!! 117563689 RBT Urgent 2508281307SKXI3 reter virf 03/10 i 2508261540SD0RI lien de suive rexp change">
+      <p class="note-text">VDR suspect je rembourse RBT ok suite VDR suspect ------------------!!! 117563689 RBT Urgent 2508281307SKXI3 reter virf 03/10 i 2508261540SD0RI lien de suive rexp change</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="VDR ne répond pas (sans tracking), je rembourse.">
+      <p class="note-text">VDR ne répond pas (sans tracking), je rembourse.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="VDR suspect ne répond pas, je rembourse.">
+      <p class="note-text">VDR suspect ne répond pas, je rembourse.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="VDR suspect, je rembourse.">
+      <p class="note-text">VDR suspect, je rembourse.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="la cliente signale qu'elle a reçu un morceau de carton à la place du SAMSUNG TV commandé, je rembourse ( vendeur suspect )">
+      <p class="note-text">la cliente signale qu'elle a reçu un morceau de carton à la place du SAMSUNG TV commandé, je rembourse ( vendeur suspect )</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="le client signale qu'elle a reçu un masqué hygiénique à la place du SAMSUNG Galaxy Z Fold5 commandé, je rembourse ( vendeur suspect )">
+      <p class="note-text">le client signale qu'elle a reçu un masqué hygiénique à la place du SAMSUNG Galaxy Z Fold5 commandé, je rembourse ( vendeur suspect )</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>2. Remboursement + geste / bon d'achat / mensualités</summary>
+  <div class="category">
+    <div class="note-item" data-template="Client informé de son remboursement d'un montant de {montant} euros qui sera présent sous 3 à 5 jours maximum sur son compte.">
+      <p class="note-text">Client informé de son remboursement d'un montant de XXX euros qui sera présent sous 3 à 5 jours maximum sur son compte.</p>
+      <div class="input-group"><label>Montant :</label><input type="text" placeholder="ex: 281.00" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Client informé de son remboursement de {montant} euros qui sera présent sous 3 à 5 jours maximum sur son compte. et l'annulation des mensualités restantes">
+      <p class="note-text">Client informé de son remboursement de XXX euros qui sera présent sous 3 à 5 jours maximum sur son compte. et l'annulation des mensualités restantes</p>
+      <div class="input-group">
+        <label>Montant :</label><input type="text" placeholder="ex: 42.86" oninput="updateNote(this)">
+        <label>Nb mensualités :</label><input type="text" placeholder="ex: 3" oninput="updateNote(this)">
+      </div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le client a été informé que son remboursement de {montant} euros a été effectué sous forme de bon d’achat, qu’il peut créditer sur son compte bancaire.">
+      <p class="note-text">Le client a été informé que son remboursement de XXX euros a été effectué sous forme de bon d’achat, qu’il peut créditer sur son compte bancaire.</p>
+      <div class="input-group"><label>Montant :</label><input type="text" placeholder="ex: 309.89" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J'ai informé le client que le RBT de la première mensualité {montant} ,Les {nombre} mensualités restantes ont été annulées.">
+      <p class="note-text">J'ai informé le client que le RBT de la première mensualité XXX ,Les trois mensualités restantes ont été annulées.</p>
+      <div class="input-group">
+        <label>Montant :</label><input type="text" placeholder="ex: 169.09" oninput="updateNote(this)">
+        <label>Nb mensualités :</label><input type="text" placeholder="ex: 3" oninput="updateNote(this)">
+      </div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le client a été informé de son remboursement sous forme de bon d’achat d’un montant de {montant} euros.">
+      <p class="note-text">Le client a été informé de son remboursement sous forme de bon d’achat d’un montant de XXX euros.</p>
+      <div class="input-group"><label>Montant :</label><input type="text" placeholder="ex: 13.04" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Client informé de son remboursement d'un montant de {montant} euros qui sera présent sous 3 à 5 jours maximum sur son compte. ainsi la réactivation de tout ses BOA.">
+      <p class="note-text">Client informé de son remboursement d'un montant de XXX euros qui sera présent sous 3 à 5 jours maximum sur son compte. ainsi la réactivation de tout ses BOA.</p>
+      <div class="input-group"><label>Montant :</label><input type="text" placeholder="ex: 10.14" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Client informé de son remboursement de {montant} euros qui sera présent sous 3 à 5 jours maximum sur son compte, et le BOA de 20 euros">
+      <p class="note-text">Client informé de son remboursement de XXX euros qui sera présent sous 3 à 5 jours maximum sur son compte, et le BOA de 20 euros</p>
+      <div class="input-group"><label>Montant :</label><input type="text" placeholder="ex: 270" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="La cliente a été informée que son remboursement d’un montant de {montant} euros sera crédité sur son compte sous 3 à 5 jours maximum.">
+      <p class="note-text">La cliente a été informée que son remboursement d’un montant de XXX euros sera crédité sur son compte sous 3 à 5 jours maximum.</p>
+      <div class="input-group"><label>Montant :</label><input type="text" placeholder="ex: 129.99" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Client injoignable 0783522256 - informé de son remboursement qui sera présent sous 3 à 5 jours maximum sur son compte. + gc 20 euros.">
+      <p class="note-text">Client injoignable 0783522256 - informé de son remboursement qui sera présent sous 3 à 5 jours maximum sur son compte. + gc 20 euros.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’accorde un geste commercial suite à la gêne occasionnée.">
+      <p class="note-text">J’accorde un geste commercial suite à la gêne occasionnée.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le client a informé de son remboursement ainsi que de l’attribution d’un bon d’achat de 20 euros.">
+      <p class="note-text">Le client a informé de son remboursement ainsi que de l’attribution d’un bon d’achat de 20 euros.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>3. Information remboursement simple</summary>
+  <div class="category">
+    <div class="note-item" data-template="J'ai informé le client concernant le remboursement de €.">
+      <p class="note-text">J'ai informé le client concernant le remboursement de €.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J'ai informé le client concernant le remboursement">
+      <p class="note-text">J'ai informé le client concernant le remboursement</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client concernant le remboursement et je l’ai invité à refuser la livraison s’il reçoit le produit.">
+      <p class="note-text">J’ai informé le client concernant le remboursement et je l’ai invité à refuser la livraison s’il reçoit le produit.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>4. Information avancement + patience</summary>
+  <div class="category">
+    <div class="note-item" data-template="J'ai informé le client de l'avancement de son dossier et je l'invite à faire preuve de patience durant le délai de traitement.">
+      <p class="note-text">J'ai informé le client de l'avancement de son dossier et je l'invite à faire preuve de patience durant le délai de traitement.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J'ai informé le client de l'avancement de son dossier et je l'invite à patienter durant le délai de traitement.">
+      <p class="note-text">J'ai informé le client de l'avancement de son dossier et je l'invite à patienter durant le délai de traitement.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client de l’avancement de son dossier et je l’ai invité à patienter en attendant la livraison du nouveau produit.">
+      <p class="note-text">J’ai informé le client de l’avancement de son dossier et je l’ai invité à patienter en attendant la livraison du nouveau produit.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="client informé de la relance de vdr pur une preuve de liv si ko remboursement sous 7 jrs . je prendrai contact avec elle pour l'avancement de sa demande sous 48h">
+      <p class="note-text">client informé de la relance de vdr pur une preuve de liv si ko remboursement sous 7 jrs . je prendrai contact avec elle pour l'avancement de sa demande sous 48h</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Aucune anomalie constatée jusqu à maintenant, je l ai invité à patienter jusqu à la livraison.">
+      <p class="note-text">Aucune anomalie constatée jusqu à maintenant, je l ai invité à patienter jusqu à la livraison.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>5. Statut colis / livraison</summary>
+  <div class="category">
+    <div class="note-item" data-template="Colis livré">
+      <p class="note-text">Colis livré</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé la cliente que son colis a bien été livré. Je l'invite à confirmer cela dans la discussion en cours.">
+      <p class="note-text">J’ai informé la cliente que son colis a bien été livré. Je l'invite à confirmer cela dans la discussion en cours.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le client a confirmé la réception de son colis.">
+      <p class="note-text">Le client a confirmé la réception de son colis.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le client confirme qu’il a bien reçu le colis.">
+      <p class="note-text">Le client confirme qu’il a bien reçu le colis.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Colis en cours de livraison.">
+      <p class="note-text">Colis en cours de livraison.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Colis en retour.">
+      <p class="note-text">Colis en retour.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="colis non reçu">
+      <p class="note-text">colis non reçu</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Colis absent au point relais.">
+      <p class="note-text">Colis absent au point relais.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que le colis est disponible en point relais depuis plus de 15 jours.">
+      <p class="note-text">J’ai informé le client que le colis est disponible en point relais depuis plus de 15 jours.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que son colis a bien été livré en point relais, et je l’ai invité à le récupérer ou à le refuser.">
+      <p class="note-text">J’ai informé le client que son colis a bien été livré en point relais, et je l’ai invité à le récupérer ou à le refuser.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J'ai informé la cliente de l'avancement de son dossier et je lui ai précisé que le colis est disponible dans un point relais. Je l'invite à le récupérer ou à le refuser.">
+      <p class="note-text">J'ai informé la cliente de l'avancement de son dossier et je lui ai précisé que le colis est disponible dans un point relais. Je l'invite à le récupérer ou à le refuser.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Commande non expédiée.">
+      <p class="note-text">Commande non expédiée.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Commande perdue.">
+      <p class="note-text">Commande perdue.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>6. Réexpédition / relance vendeur / suivi</summary>
+  <div class="category">
+    <div class="note-item" data-template="Réexpédition en cours .">
+      <p class="note-text">Réexpédition en cours .</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Réexpédition confirmée.">
+      <p class="note-text">Réexpédition confirmée.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J ai informé le client que le vendeur a bien fourni un lien de suivi valide pour suivre la livraison du nouvel envoi.">
+      <p class="note-text">J ai informé le client que le vendeur a bien fourni un lien de suivi valide pour suivre la livraison du nouvel envoi.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que j’ai relancé le vendeur afin qu’il envoie un lien de suivi valide pour suivre la réexpédition.">
+      <p class="note-text">J’ai informé le client que j’ai relancé le vendeur afin qu’il envoie un lien de suivi valide pour suivre la réexpédition.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que j’ai relancé le vendeur afin qu’il fournisse un lien de suivi valide pour suivre la livraison du nouvel envoi.">
+      <p class="note-text">J’ai informé le client que j’ai relancé le vendeur afin qu’il fournisse un lien de suivi valide pour suivre la livraison du nouvel envoi.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que j’ai relancé le vendeur concernant le remboursement.">
+      <p class="note-text">J’ai informé le client que j’ai relancé le vendeur concernant le remboursement.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai relancé le vendeur pour vérifier l’état de la livraison du colis.">
+      <p class="note-text">J’ai relancé le vendeur pour vérifier l’état de la livraison du colis.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="client a été informé que le vendeur a été relancé de la réexpidition">
+      <p class="note-text">client a été informé que le vendeur a été relancé de la réexpidition</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que j’ai relancé le vendeur pour proposer une solution.">
+      <p class="note-text">J’ai informé le client que j’ai relancé le vendeur pour proposer une solution.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que j’ai relancé le vendeur afin qu’il fournisse une preuve de livraison ou propose une solution adaptée.">
+      <p class="note-text">J’ai informé le client que j’ai relancé le vendeur afin qu’il fournisse une preuve de livraison ou propose une solution adaptée.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai informé le client que j’ai relancé le vendeur afin qu’il envoie un lien de suivi valide ou propose une solution adaptée.">
+      <p class="note-text">J’ai informé le client que j’ai relancé le vendeur afin qu’il envoie un lien de suivi valide ou propose une solution adaptée.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>7. Demande confirmation client</summary>
+  <div class="category">
+    <div class="note-item" data-template="J’ai informé le client que sa commande est toujours en cours de livraison et je l’ai invité à confirmer s’il souhaite attendre ou demander un remboursement.">
+      <p class="note-text">J’ai informé le client que sa commande est toujours en cours de livraison et je l’ai invité à confirmer s’il souhaite attendre ou demander un remboursement.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J'ai demandé au client de bien vouloir confirmer s’il préfère une réexpédition du produit ou un remboursement.">
+      <p class="note-text">"J'ai demandé au client de bien vouloir confirmer s’il préfère une réexpédition du produit ou un remboursement."</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="J’ai demandé au client de confirmer s’il souhaite une réexpédition ou un remboursement.">
+      <p class="note-text">J’ai demandé au client de confirmer s’il souhaite une réexpédition ou un remboursement.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Attendre la réponse du client.">
+      <p class="note-text">Attendre la réponse du client.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>8. Dossier / commande déjà traitée</summary>
+  <div class="category">
+    <div class="note-item" data-template="Cas déjà en cours de traitement sur le dossier {dossier}.">
+      <p class="note-text">Cas déjà en cours de traitement sur le dossier 117243606.</p>
+      <div class="input-group"><label>Numéro dossier :</label><input type="text" placeholder="ex: 117243606" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Cas deja traite sur le dossier {dossier}">
+      <p class="note-text">Cas deja traite sur le dossier 117217219</p>
+      <div class="input-group"><label>Numéro dossier :</label><input type="text" placeholder="ex: 117217219" oninput="updateNote(this)"></div>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Commande déjà remboursée">
+      <p class="note-text">Commande déjà remboursée</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Commande déjà remboursée.">
+      <p class="note-text">Commande déjà remboursée.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>9. Transfert dossier / vérif transporteur / SDE</summary>
+  <div class="category">
+    <div class="note-item" data-template="J’ai informé le client que j’ai transféré son dossier à notre équipe pour vérifier la preuve de livraison et je l’ai invité à patienter le temps du traitement.">
+      <p class="note-text">J’ai informé le client que j’ai transféré son dossier à notre équipe pour vérifier la preuve de livraison et je l’ai invité à patienter le temps du traitement.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le client a été informé que son dossier a été transféré au service concerné afin que des vérifications soient effectuées auprès du transporteur. Il recevra le suivi de traitement sous 48 heures.">
+      <p class="note-text">Le client a été informé que son dossier a été transféré au service concerné afin que des vérifications soient effectuées auprès du transporteur. Il recevra le suivi de traitement sous 48 heures.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="cliente informée que la demande a été transmise au service afin que des vérifications doivent être faites auprès du transporteur-elle reçoit le suivi de traitement sous 48h">
+      <p class="note-text">cliente informée que la demande a été transmise au service afin que des vérifications doivent être faites auprès du transporteur-elle reçoit le suivi de traitement sous 48h</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="client a été informé de transmettre le dossier à l'équipe dédié pour faire des recherches auprès de transporteur et sera informé dans un délai du 48 heurs .">
+      <p class="note-text">client a été informé de transmettre le dossier à l'équipe dédié pour faire des recherches auprès de transporteur et sera informé dans un délai du 48 heurs .</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>10. Divers / Autres</summary>
+  <div class="category">
+    <div class="note-item" data-template="***remarque : Le vendeur a bien envoyé le code d’activation depuis le SDE.">
+      <p class="note-text">***remarque : Le vendeur a bien envoyé le code d’activation depuis le SDE.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="difficulté à laisser msg vocal; l'appel s'interrompt lors du msg vocal">
+      <p class="note-text">difficulté à laisser msg vocal; l'appel s'interrompt lors du msg vocal</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Mise en attente pour s assurer de la livraison de la commande">
+      <p class="note-text">Mise en attente pour s assurer de la livraison de la commande</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="er 1489 / p abi 2289 / ac manq :1490 / ret 1040 5j">
+      <p class="note-text">er 1489 / p abi 2289 / ac manq :1490 / ret 1040 5j</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="117332494 si reponse SDE 117384939 j'ai rbt par errur">
+      <p class="note-text">117332494 si reponse SDE 117384939 j'ai rbt par errur</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="Le lien de suivi[](https://t.17track.net/fr#nums=6A03351593283) ne permet pas de suivre la livraison de cette nouvelle expédition.">
+      <p class="note-text">Le lien de suivi[](https://t.17track.net/fr#nums=6A03351593283) ne permet pas de suivre la livraison de cette nouvelle expédition.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+    <div class="note-item" data-template="La cliente sollicite un remboursement, en raison de l'absence de réponse du vendeur.">
+      <p class="note-text">La cliente sollicite un remboursement, en raison de l'absence de réponse du vendeur.</p>
+      <button class="copy-btn" onclick="copyNote(this)">Copier</button>
+    </div>
+  </div>
+</details>
+
+<footer>Toutes les notes uniques – Montant, Nb mensualités, Numéro dossier • Fonctionne hors connexion</footer>
+
+<script>
+function updateNote(input) {
+  const item = input.closest('.note-item');
+  const noteText = item.querySelector('.note-text');
+  let text = noteText.textContent;
+
+  const montantInput = item.querySelector('input[placeholder*="ex: 42.86"], input[placeholder*="ex: 129.99"], input[placeholder*="ex: 281"], input[placeholder*="ex: 169.09"], input[placeholder*="ex: 13.04"], input[placeholder*="ex: 10.14"], input[placeholder*="ex: 270"], input[placeholder*="ex: 309.89"]');
+  const nbMensInput  = item.querySelector('input[placeholder*="ex: 3"]');
+  const dossierInput = item.querySelector('input[placeholder*="ex: 117243606"], input[placeholder*="ex: 117217219"]');
+
+  const montant = montantInput ? montantInput.value.trim() : '';
+  const nbMens  = nbMensInput  ? nbMensInput.value.trim()  : '';
+  const dossier = dossierInput ? dossierInput.value.trim() : '';
+
+  // Montant
+  if (montant && (text.includes('XXX') || text.includes('{montant}'))) {
+    text = text.replace(/XXX|{montant}/g, montant);
+  }
+
+  // Nb mensualités
+  if (nbMens && nbMens.match(/^\d+$/)) {
+    let phrase = `Les ${nbMens} mensualités restantes ont été annulées.`;
+    if (nbMens === '1') phrase = `La mensualité restante a été annulée.`;
+    text = text.replace(/Les .* mensualités? restantes ont été annulées\./i, phrase);
+  }
+
+  // Numéro dossier
+  if (dossier && dossier.match(/^\d+$/)) {
+    text = text.replace(/\d{6,}/, dossier);
+  }
+
+  noteText.textContent = text;
+}
+
+function copyNote(btn) {
+  const item = btn.closest('.note-item');
+  const text = item.querySelector('.note-text').textContent.trim();
+
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 1800);
+  }).catch(() => {
+    alert('Erreur lors de la copie – sélectionnez le texte manuellement');
+  });
+}
+</script>
+
+</body>
+</html>
