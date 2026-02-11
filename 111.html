@@ -6,7 +6,7 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       background: #f4f6f9;
       padding: 30px;
     }
@@ -54,36 +54,75 @@
     button:hover {
       background: #0056b3;
     }
+
+    #result {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
   </style>
 </head>
 
 <body>
 
 <div class="box">
-  <h2>Créer un fichier JSON</h2>
+  <h2>Créer un enregistrement JSON</h2>
 
-  <!-- إرسال البيانات إلى PHP -->
-  <form method="POST" action="save.php">
+  <form id="jsonForm">
 
     <label>Raison :</label>
-    <input type="text" name="raison" required>
+    <input type="text" id="raison" required>
 
-    <label>Message pour le client :</label>
-    <textarea name="message_client" rows="3" required></textarea>
+    <label>Message client :</label>
+    <textarea id="message_client" required></textarea>
 
-    <label>Message pour le vendeur :</label>
-    <textarea name="message_vendeur" rows="3" required></textarea>
+    <label>Message vendeur :</label>
+    <textarea id="message_vendeur" required></textarea>
 
     <label>Action :</label>
-    <input type="text" name="action" required>
+    <input type="text" id="action" required>
 
     <label>Note :</label>
-    <textarea name="note" rows="2"></textarea>
+    <textarea id="note"></textarea>
 
-    <button type="submit">Enregistrer dans data.json</button>
+    <button type="submit">Envoyer</button>
 
+    <div id="result"></div>
   </form>
 </div>
+
+<script>
+document.getElementById("jsonForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const data = {
+    raison: document.getElementById("raison").value,
+    message_client: document.getElementById("message_client").value,
+    message_vendeur: document.getElementById("message_vendeur").value,
+    action: document.getElementById("action").value,
+    note: document.getElementById("note").value
+  };
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = "⏳ Envoi en cours...";
+
+  try {
+    const response = await fetch("http://aao.myartsonline.com/myo/save.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const text = await response.text();
+    resultDiv.innerHTML = text;
+
+  } catch (err) {
+    resultDiv.innerHTML = "❌ Erreur: impossible d’envoyer.";
+  }
+});
+</script>
 
 </body>
 </html>
