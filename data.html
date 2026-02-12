@@ -1,122 +1,86 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدخال البيانات</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 0.75rem;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #message {
-            margin-top: 1rem;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <form id="dataForm">
-            <div class="form-group">
-                <label for="client">Client:</label>
-                <input type="text" id="client" name="client" required>
-            </div>
-            <div class="form-group">
-                <label for="vendeur">Vendeur:</label>
-                <input type="text" id="vendeur" name="vendeur" required>
-            </div>
-            <div class="form-group">
-                <label for="action">Action:</label>
-                <input type="text" id="action" name="action" required>
-            </div>
-            <button type="submit">Envoyer</button>
-        </form>
-        <div id="message"></div>
-    </div>
-
-    <script>
-        document.getElementById('dataForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbxIw81436ni6QxWAbd370HC5jse4XGuDZGs27ly0qtG-FqvuD5DACfUzIe1DgtGnrc-/exec"; // الصق عنوان URL هنا
-
-            const client = document.getElementById('client').value;
-            const vendeur = document.getElementById('vendeur').value;
-            const action = document.getElementById('action').value;
-            const messageDiv = document.getElementById('message');
-
-            const data = {
-                client: client,
-                vendeur: vendeur,
-                action: action
-            };
-
-            fetch(webAppUrl, {
-                method: 'POST',
-                mode: 'cors',
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                redirect: 'follow',
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    messageDiv.textContent = 'تم إرسال البيانات بنجاح!';
-                    messageDiv.style.color = 'green';
-                    document.getElementById('dataForm').reset();
-                } else {
-                    messageDiv.textContent = 'حدث خطأ أثناء إرسال البيانات.';
-                    messageDiv.style.color = 'red';
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                messageDiv.textContent = 'حدث خطأ فادح.';
-                messageDiv.style.color = 'red';
-            });
-        });
-    </script>
-
-</body>
-</html>
+[
+  {
+    "Raison": "erur de referencee\n",
+    "Message client": "Bonjour,\n\nA la suite de votre demande de retour, le vendeur vous a proposé une solution conforme. \n\nNous vous invitons à renvoyer le produit dès que possible. Vous serez remboursés maximum 3 jours après réception du colis par le vendeur. \n\nEn cas de problème avec le remboursement ou avec le retour, vous pourrez demander l’intervention de Cdiscount directement depuis la rubrique “Mes messages”.\n\nA très bientôt, \n\nL’équipe Cdiscount \n",
+    "Message vendeur": "            ",
+    "Action": "386 - information sans traitement / 549- Rembourser des frais si besoin \n\n19 - Clôture du dossier ",
+    "Note": "solution conforme, client informé de la suite \n"
+  },
+  {
+    "Raison": "Cree NA",
+    "Message client": "Bonjour,\n\nNous vous informons qu'une étiquette de retour a été générée par nos services. Vous pouvez la trouver dans votre espace client Cdiscount, sous la rubrique \"Mes commandes\", en lien avec la commande pour laquelle vous avez signalé que le produit ne fonctionne pas.\n\nPour retourner votre produit :\n\nImprimez l’étiquette et rendez-vous dans le point de dépôt le plus proche.\n\nVous n’avez rien à régler, cette étiquette couvre les frais de retour.\n\nLe produit doit être soigneusement emballé dans un conditionnement offrant une protection équivalente à celle d'origine.\n\nMerci de conserver la preuve de dépôt ou une copie de l’étiquette de retour qui mentionne l’adresse du destinataire et de nous la fournir dans un délai de 7 jours.\n\nPour être pris en charge :\n\nTous les objets connectés ou sécurisés par code doivent être déverrouillés et la géolocalisation désactivée.\n\nLes comptes connectés doivent avoir été désactivés ou supprimés.\n\nPour les appareils électroniques, n'oubliez pas de débrancher la batterie en vous référant à la notice.\n\nDès réception du colis dans nos entrepôts, nous procéderons au traitement de votre demande et au remboursement.\n\nMerci pour votre compréhension,\n\nCordialement,\n\nAbdelkrim  L’équipe Cdiscount ",
+    "Message vendeur": "Bonjour,\n\nLe client signale une panne de son téléphone dans les 15 premiers jours suivant la réception de celui-ci.\n\nNous lui adressons ce jour un accord de retour vers nos entrepôts et procèderons au remboursement du produit, à votre charge, dès réception.\n\nBonne journée,\n\nL’équipe Cdiscount\n",
+    "Action": "                                    ",
+    "Note": "client informé sur NA pour le retour du pdt en panne et qu'il sera géré 48h après réception du pdt dans notre entrepôt - étiquette dispo par mail et sur EC / s'il souhaite avoir remplacement ou réparation, il peut garder contact avec le vendeur"
+  },
+  {
+    "Raison": "sav vdr demande infos \n",
+    "Message client": "Bonjour,\n\nPour pouvoir traiter votre demande, le vendeur a besoin d’informations complémentaires :\n##[DETAIL DES INFORMATIONS MANQUANTES]## \nA réception des informations, le vendeur vous proposera une solution de prise en charge.\n\nDe notre coté, nous veillerons à ce que cette solution soit mise en œuvre correctement et dans un délai raisonnable. Nous vous remercions de votre bonne collaboration,\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse ; Vous avez indiqué avoir besoin d'éléments complémentaires afin d'établir un diagnostic,\n\nNous prenons contact avec le client afin d'appuyer votre demande et qu'il vous apporte les informations demandées dans les meilleurs délais.\n\nEn attendant, nous vous invitons à lui fournir une solution conforme  de prise en charge.\n\nMerci pour votre prise en charge, \n\nL’équipe Cdiscount ",
+    "Action": "2 - MEA 2 jours",
+    "Note": "Le vendeur demande des informations, Attendre la réponse du client."
+  },
+  {
+    "Raison": "vdr acc prise",
+    "Message client": "                          ",
+    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse et vous en remercions ; Vous avez confirmé au client la prise en charge que vous souhaitez mettre en place et semblez avoir tous les éléments nécessaires au bon déroulé de celle-ci.\n\nNous vous laissons donc poursuivre et reviendrons vers le client et vous  afin de nous assurer de la bonne suite des évènements.\n\nNous vous remercions de votre réactivité \n\nCordialement,\n\nL'équipe Cdiscount",
+    "Action": "MEA 3 jours",
+    "Note": "contrôle mise en place solution sous 3 jours "
+  },
+  {
+    "Raison": "vdr ne rep pas -2j",
+    "Message client": "Bonjour,\n\nNous relançons ce jour le vendeur  afin qu’il vous fournisse une solution pour réparer votre produit. Nous vous invitons à rester en contact avec votre vendeur directement depuis cette discussion.\n\nNous reviendrons vers vous  dans 48 h ouvres afin de valider la bonne prise en charge de votre demande.\n\nMerci pour votre compréhension,\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nLe client vous a signalé une panne sur son produit , et n'a pas obtenu de réponse de votre part. Nous vous rappelons votre obligation de répondre sous 48h à la demande de prise en charge.\n\nSi  vous n’apportez pas de réponse sous 24h , cette discussion sera passée en réclamation et vous vous exposerez à un  possible remboursement à vos frais de cette commande.\n\nNous vous remercions de votre réactivité et comptons sur votre confirmation de prise en charge de la demande du client.\n\nBonne journée,",
+    "Action": "388 - MEA 1 jour",
+    "Note": "En attente de la réponse du vendeur.\nEn attente de la prise en charge par le vendeur."
+  },
+  {
+    "Raison": "Produit non éligible\n",
+    "Message client": "Bonjour,\n\nLe vendeur ne peut prendre en charge la panne de votre produit car celui ci : ##Motif inéligibilité##\n\nIl peut toutefois vous proposer un devis de réparation que vous serez libre d’accepter ou pas.\n\nMerci pour votre compréhension,\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nLe vendeur ne peut prendre en charge la panne de votre produit car celui ci : ##Motif inéligibilité##\n\nIl peut toutefois vous proposer un devis de réparation que vous serez libre d’accepter ou pas.\n\nMerci pour votre compréhension,\n\nL'équipe Cdiscount",
+    "Action": "490 Produit non éligible + 19 \n",
+    "Note": "Produit non éligible"
+  },
+  {
+    "Raison": "vendeur ne propose aucun solutio aprs MEA ou refuse pris encharge",
+    "Message client": "Bonjour,\n\nNous relançons ce jour le vendeur  afin qu’il vous fournisse une solution pour réparer votre produit. Nous vous invitons à rester en contact avec votre vendeur directement depuis cette discussion. Nous reviendrons vers vous  dans 48 h ouvres afin de valider la bonne prise en charge de votre réclamation.\n\nMerci pour votre compréhension,\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour, \n\nLe client vous contacte car il indique que son produit est en panne, sans réponse de votre part ce jour, nous passerons la discussion en réclamation.\n\nNous vous rappelons que vous avez 48h pour lui apporter une solution conforme : \n\nAdresse de retour en France\n\nEtiquette de retour\n\nCoordonnées d’un transporteur et adresse de retour pour les produits Volumineux\n\nNous gardons le dossier sous surveillance et, conformément aux CGMAD et au Guide de la Relation Acheteur-Vendeur, nous procéderons au remboursement si vous n’apportez de solution conforme dans ce délai. \n\nNous vous remercions de votre réactivité et comptons sur votre confirmation de prise en charge de la demande du client.\n\nBonne journée,\n",
+    "Action": "1157 - Passage  en réclamation\n",
+    "Note": "                 "
+  },
+  {
+    "Raison": "Le vendeur accepte la prise en charge. Il a fourni au client une étiquette de retour.",
+    "Message client": "Bonjour,\n\nAfin de retourner votre produit, nous vous invitons à suivre les instructions du vendeur.\nCe dernier vous a fournir une étiquette de retour, rendez-vous dans le lieu de dépôt le plus proche prenant en charge cette étiquette. \n\nPensez à conserver la preuve de dépôt de votre produit afin d'être remboursé d'éventuels frais de retour. Vous pourrez déposer cette preuve directement sur votre espace client.\n\nMerci de votre compréhension,\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse et vous en remercions ; Vous avez confirmé au client la prise en charge que vous souhaitez mettre en place et semblez avoir tous les éléments nécessaires au bon déroulé de celle-ci.\n\nNous vous laissons donc poursuivre et reviendrons vers le client et vous  afin de nous assurer de la bonne suite des évènements.\n\nNous vous remercions de votre réactivité \n\nCordialement,\n\nL'équipe Cdiscount",
+    "Action": "                        ",
+    "Note": "                           "
+  },
+  {
+    "Raison": "Le vendeur accepte la prise en charge. Il a fourni au client une adresse",
+    "Message client": "Bonjour,\n\nAfin de retourner votre produit, nous vous invitons à suivre les instructions du vendeur.\nCe dernier vous a fourni une adresse en France. Nous vous invitons à retourner le produit par la poste.\n\nPensez à conserver la preuve de dépôt. Vous pourrez la déposer directement depuis cette discussion et communiquer au vendeur le numéro de suivi afin de suivre le retour.\n\nMerci de votre compréhension,\nL’équipe Cdiscount\n",
+    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse et vous en remercions ; Vous avez confirmé au client la prise en charge que vous souhaitez mettre en place et semblez avoir tous les éléments nécessaires au bon déroulé de celle-ci.\n\nNous avançons les frais au client, et nous vous laissons donc poursuivre et reviendrons vers le client et vous afin de nous assurer de la bonne suite des évènements.\n\nNous vous remercions de votre réactivité \n\nCordialement,\nL'équipe Cdiscount",
+    "Action": "mail 1393\n389 contrôle mise en place solution sous 3 jours ",
+    "Note": "*Avancement des frais de retour\n**Le vendeur confirme la prise en charge. J’ai avancé les frais de retour et j’ai invité le client à retourner le produit directement au vendeur.\n\n***Le vendeur confirme la prise en charge. J’ai remboursé les frais de retour au client.\nUn recrédit a été effectué sur votre compte bancaire pour les frais de retour associés.\nPensez à rester en contact avec le vendeur. Une fois le retour confirmé, il procédera à la solution appropriée."
+  },
+  {
+    "Raison": "Le client signale que le problème a été résolu et refuse de retourner le produit.\n",
+    "Message client": "Bonjour,\n\nNous constatons que votre panne a bien été résolue.\nEn cas de nouveau problème, n’hésitez pas à contacter directement votre vendeur depuis cette discussion.\n\nMerci de votre compréhension.\n\nCordialement,\nL’équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nNous vous remercions pour la bonne prise en charge de la panne.\nCelle-ci étant désormais résolue, nous vous invitons à vous assurer de la satisfaction du client concernant votre intervention.\n\nCordialement,\n\nAbdelkrim\nL’équipe Cdiscoun",
+    "Action": "                                  ",
+    "Note": "19"
+  },
+  {
+    "Raison": "rexpe piece",
+    "Message client": "Bonjour,\n\nNous invitons le vendeur à réaliser le nouvel envoi proposé au plus vite et de vous fournir le lien de suivi associé pour que vous puissiez suivre son acheminement.\n\nNous vous invitons à rester en contact avec votre vendeur directement depuis cette discussion.\n\nMerci pour votre compréhension,\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nVous avez proposé au client un nouvel envoi et nous vous en remercions. \n\nNous vous invitons à nous fournir le lien de suivi dans les 48h. A défaut, nous nous réservons le droit de procéder au remboursement de la commande, conformément à nos CGMAD.\n\nCordialement,\nAbdelkrim, L'équipe Cdiscount",
+    "Action": "             ",
+    "Note": "                       "
+  },
+  {
+    "Raison": "clt ne repnd pas ",
+    "Message client": "Le client ne répond pas. Je l’ai invité à rester en contact avec le vendeur et à fournir les éléments demandés afin que sa demande puisse être traitée.\n",
+    "Message vendeur": "Bonjour,\n\nComme convenu, nous revenons sur ce dossier et notons que le client ne vous a pas  fourni  le produit / les éléments indispensables  pour établir un diagnostic  et procéder ensuite à la réparation .\n\nNous prenons contact avec le client  et lui signifions la clôture de ce dossier.\n\nBien sur, si le client fourni ces éléments en suivant, nous comptons sur vous pour une prise en charge efficace de sa demande.\n\nNous vous remercions de votre coopération\n\nCordialement,\n\nL'équipe Cdiscount",
+    "Action": "19 ",
+    "Note": "Le client ne répond pas. Je l’ai invité à rester en contact avec le vendeur et à fournir les éléments demandés afin que sa demande puisse être traitée.\n"
+  }
+]
