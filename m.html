@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modèles de Réponse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --active-blue: #007bff;
+            --border-color: #dee2e6;
+            --text-dark: #333;
+            --add-btn-bg: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 10px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 98%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            min-height: 90vh;
+        }
+
+        /* Zone des boutons */
+        .filters-wrapper {
+            padding: 15px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12.5px;
+            transition: all 0.2s;
+            color: #444;
+        }
+
+        .filter-btn:hover { 
+            border-color: var(--active-blue); 
+            background: #fff;
+        }
+
+        .filter-btn.active {
+            background: var(--active-blue);
+            color: white;
+            border-color: var(--active-blue);
+        }
+
+        /* زر الإضافة بأيقونة SVG */
+        .add-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--add-btn-bg);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            text-decoration: none;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .add-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        /* Content Display Area */
+        .content-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            align-items: start;
+        }
+
+        .box {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .box-header {
+            background: #f1f3f5;
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            color: #495057;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            background: var(--active-blue);
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .copy-btn.copied { background: #28a745 !important; }
+
+        .box-body {
+            padding: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            white-space: pre-wrap;
+            height: 480px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .loader { text-align: center; padding: 40px; width: 100%; font-weight: bold; color: var(--active-blue); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="filters" class="filters-wrapper">
+        <div class="loader">Chargement...</div>
+    </div>
+
+    <div id="display-grid" class="content-area" style="display: none;">
+        <div class="box">
+            <div class="box-header">MESSAGE CLIENT <button class="copy-btn" onclick="copyContent('client-text')">Copier</button></div>
+            <div id="client-text" class="box-body"></div>
+        </div>
+        <div class="box">
+            <div class="box-header">MESSAGE VENDEUR <button class="copy-btn" onclick="copyContent('vendeur-text')">Copier</button></div>
+            <div id="vendeur-text" class="box-body"></div>
+        </div>
+        <div class="box">
+            <div class="box-header">ACTION <button class="copy-btn" onclick="copyContent('action-text')">Copier</button></div>
+            <div id="action-text" class="box-body"></div>
+        </div>
+        <div class="box">
+            <div class="box-header">NOTES <button class="copy-btn" onclick="copyContent('note-text')">Copier</button></div>
+            <div id="note-text" class="box-body"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const jsonUrl = 'https://wallart.free.nf/data.json';
+    let database = [];
+
+    async function init() {
+        try {
+            const response = await fetch(jsonUrl);
+            database = await response.json();
+            renderButtons(database);
+        } catch (err) {
+            document.getElementById('filters').innerHTML = `<span style="color:red">Erreur de données.</span>`;
+        }
+    }
+
+    function renderButtons(data) {
+        const filterContainer = document.getElementById('filters');
+        filterContainer.innerHTML = '';
+        
+        // إنشاء أزرار البيانات
+        data.forEach((item, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.innerText = item.Raison.trim();
+            btn.onclick = () => selectItem(index, btn);
+            filterContainer.appendChild(btn);
+        });
+
+        // إضافة زر "+" في النهاية
+        const addBtn = document.createElement('a');
+        addBtn.href = '/myo/o.html';
+        addBtn.className = 'add-btn';
+        addBtn.title = 'Ajouter un nouveau modèle';
+        addBtn.innerHTML = `
+            <svg viewBox="0 0 24 24">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+        `;
+        filterContainer.appendChild(addBtn);
+
+        if (data.length > 0) filterContainer.firstChild.click();
+    }
+
+    function selectItem(index, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const item = database[index];
+        document.getElementById('display-grid').style.display = 'grid';
+        document.getElementById('client-text').innerText = item["Message client"]?.trim() || "N/A";
+        document.getElementById('vendeur-text').innerText = item["Message vendeur"]?.trim() || "N/A";
+        document.getElementById('action-text').innerText = item.Action?.trim() || "---";
+        document.getElementById('note-text').innerText = item.Note?.trim() || "---";
+    }
+
+    window.copyContent = function(id) {
+        const text = document.getElementById(id).innerText;
+        const btn = event.target;
+        if(text === "N/A" || text === "---") return;
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = 'Copié !';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('copied');
+            }, 1000);
+        });
+    }
+    init();
+</script>
+
+</body>
+</html>
