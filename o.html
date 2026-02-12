@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enregistrement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --active-blue: #007bff;
+            --bg-color: #f4f7f9;
+            --border-color: #dee2e6;
+            --text-dark: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 95vh;
+        }
+
+        .box {
+            width: 100%;
+            max-width: 650px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--active-blue);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        #raison { min-height: 45px; }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 14px;
+            background: var(--active-blue);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover { background: var(--primary-blue); }
+        button:active { transform: scale(0.98); }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <form id="jsonForm" class="form-grid">
+        <div class="input-group">
+            <label for="raison">Raison</label>
+            <textarea id="raison" required></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="message_client">Message Client</label>
+            <textarea id="message_client" required></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="message_vendeur">Message Vendeur</label>
+            <textarea id="message_vendeur" required></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="action">Action à réaliser</label>
+            <textarea id="action" required></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="note">Note</label>
+            <textarea id="note"></textarea>
+        </div>
+
+        <button type="submit">Enregistrer le modèle</button>
+
+        <div id="result"></div>
+    </form>
+</div>
+
+<script>
+document.getElementById("jsonForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const data = {
+        "Raison": document.getElementById("raison").value,
+        "Message client": document.getElementById("message_client").value,
+        "Message vendeur": document.getElementById("message_vendeur").value,
+        "Action": document.getElementById("action").value,
+        "Note": document.getElementById("note").value
+    };
+
+    const resultDiv = document.getElementById("result");
+    resultDiv.className = ""; 
+    resultDiv.innerHTML = "⏳ Envoi...";
+
+    try {
+        const response = await fetch("save.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            resultDiv.innerHTML = "✅ Enregistré avec succès !";
+            resultDiv.classList.add("success");
+            document.getElementById("jsonForm").reset();
+        } else {
+            throw new Error();
+        }
+    } catch {
+        resultDiv.innerHTML = "❌ Erreur d’envoi.";
+        resultDiv.classList.add("error");
+    }
+});
+</script>
+
+</body>
+</html>
