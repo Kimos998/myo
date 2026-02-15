@@ -1,0 +1,198 @@
+<?php
+// ---------------------
+// جزء PHP بسيط لقراءة الملاحظات الموجودة
+// ---------------------
+$jsonFile = 'data/notes.json';
+$notes = [];
+
+if (file_exists($jsonFile)) {
+    $jsonContent = file_get_contents($jsonFile);
+    $notes = json_decode($jsonContent, true) ?: [];
+}
+?>
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>إدارة الملاحظات الجاهزة</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .form-box, .list-box {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 600;
+      color: #444;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 16px;
+      padding: 10px 24px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .note-item {
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 14px;
+      background: #fafafa;
+      position: relative;
+    }
+    .note-type {
+      font-weight: bold;
+      color: #e67e22;
+      margin-bottom: 6px;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 6px 12px;
+      background: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .copy-btn.copied {
+      background: #27ae60;
+    }
+    .empty {
+      text-align: center;
+      color: #777;
+      padding: 40px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>إضافة / إدارة ملاحظات جاهزة</h1>
+
+  <!-- نموذج الإضافة -->
+  <div class="form-box">
+    <form id="noteForm">
+      <label for="type">نوع الحالة / العنوان:</label>
+      <input type="text" id="type" placeholder="مثال: تأخير التوصيل" required />
+
+      <label for="content">نص الملاحظة:</label>
+      <textarea id="content" placeholder="اكتب النص الذي تريد حفظه..." required></textarea>
+
+      <button type="submit">حفظ الملاحظة</button>
+    </form>
+  </div>
+
+  <!-- قائمة الملاحظات -->
+  <div class="list-box">
+    <h2 style="margin-bottom: 16px;">الملاحظات المحفوظة</h2>
+
+    <div id="notesContainer">
+      <?php if (empty($notes)): ?>
+        <div class="empty">لا توجد ملاحظات بعد</div>
+      <?php else: ?>
+        <?php foreach ($notes as $index => $note): ?>
+          <div class="note-item" data-index="<?= $index ?>">
+            <div class="note-type"><?= htmlspecialchars($note['type']) ?></div>
+            <pre style="margin: 8px 0; white-space: pre-wrap;"><?= htmlspecialchars($note['content']) ?></pre>
+            <button class="copy-btn" onclick="copyNote(this, <?= $index ?>)">نسخ</button>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('noteForm');
+  const container = document.getElementById('notesContainer');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const type = document.getElementById('type').value.trim();
+    const content = document.getElementById('content').value.trim();
+
+    if (!type || !content) {
+      alert('يرجى ملء جميع الحقول');
+      return;
+    }
+
+    try {
+      const res = await fetch('https://wallart.free.nf/save_note.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, content })
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert('تم حفظ الملاحظة بنجاح');
+        form.reset();
+        location.reload(); // تحديث الصفحة لعرض الملاحظة الجديدة
+      } else {
+        alert('حدث خطأ: ' + (result.error || 'غير معروف'));
+      }
+    } catch (err) {
+      alert('فشل الاتصال بالخادم: ' + err.message);
+    }
+  });
+
+  function copyNote(btn, index) {
+    const noteItem = btn.closest('.note-item');
+    const text = noteItem.querySelector('pre').textContent;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'منسوخ!';
+      setTimeout(() => btn.textContent = orig, 1400);
+    }).catch(() => {
+      alert('فشل النسخ');
+    });
+  }
+</script>
+</body>
+</html>
