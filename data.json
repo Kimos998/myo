@@ -16,21 +16,21 @@
   {
     "Raison": "sav vdr demande infos \n",
     "Message client": "Bonjour,\n\nPour pouvoir traiter votre demande, le vendeur a besoin d’informations complémentaires :\n##[DETAIL DES INFORMATIONS MANQUANTES]## \nA réception des informations, le vendeur vous proposera une solution de prise en charge.\n\nDe notre coté, nous veillerons à ce que cette solution soit mise en œuvre correctement et dans un délai raisonnable. Nous vous remercions de votre bonne collaboration,\n\nL'équipe Cdiscount",
-    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse ; Vous avez indiqué avoir besoin d'éléments complémentaires afin d'établir un diagnostic,\n\nNous prenons contact avec le client afin d'appuyer votre demande et qu'il vous apporte les informations demandées dans les meilleurs délais.\n\nEn attendant, nous vous invitons à lui fournir une solution conforme  de prise en charge.\n\nMerci pour votre prise en charge, \n\nL’équipe Cdiscount ",
-    "Action": "2 - MEA 2 jours",
+    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse ; Vous avez indiqué avoir besoin d'éléments complémentaires afin d'établir un diagnostic,\n\nNous prenons contact avec le client afin d'appuyer votre demande et qu'il vous apporte les informations demandées dans les meilleurs délais.\n\nEn attendant, nous vous invitons à lui fournir une solution conforme  de prise en charge.\n\nMerci pour votre prise en charge, \n\nL’équipe Cdiscount ",
+    "Action": "2 - MEA 2 jours",
     "Note": "Le vendeur demande des informations, Attendre la réponse du client."
   },
   {
     "Raison": "vdr acc prise",
     "Message client": "                          ",
-    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse et vous en remercions ; Vous avez confirmé au client la prise en charge que vous souhaitez mettre en place et semblez avoir tous les éléments nécessaires au bon déroulé de celle-ci.\n\nNous vous laissons donc poursuivre et reviendrons vers le client et vous  afin de nous assurer de la bonne suite des évènements.\n\nNous vous remercions de votre réactivité \n\nCordialement,\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nNous accusons réception de votre réponse et vous en remercions ; Vous avez confirmé au client la prise en charge que vous souhaitez mettre en place et semblez avoir tous les éléments nécessaires au bon déroulé de celle-ci.\n\nNous vous laissons donc poursuivre et reviendrons vers le client et vous  afin de nous assurer de la bonne suite des évènements.\n\nNous vous remercions de votre réactivité \n\nCordialement,\n\nL'équipe Cdiscount",
     "Action": "MEA 3 jours",
-    "Note": "contrôle mise en place solution sous 3 jours "
+    "Note": "contrôle mise en place solution sous 3 jours "
   },
   {
     "Raison": "vdr ne rep pas -2j",
-    "Message client": "Bonjour,\n\nNous relançons ce jour le vendeur  afin qu’il vous fournisse une solution pour réparer votre produit. Nous vous invitons à rester en contact avec votre vendeur directement depuis cette discussion.\n\nNous reviendrons vers vous  dans 48 h ouvres afin de valider la bonne prise en charge de votre demande.\n\nMerci pour votre compréhension,\n\nL'équipe Cdiscount",
-    "Message vendeur": "Bonjour,\n\nLe client vous a signalé une panne sur son produit , et n'a pas obtenu de réponse de votre part. Nous vous rappelons votre obligation de répondre sous 48h à la demande de prise en charge.\n\nSi  vous n’apportez pas de réponse sous 24h , cette discussion sera passée en réclamation et vous vous exposerez à un  possible remboursement à vos frais de cette commande.\n\nNous vous remercions de votre réactivité et comptons sur votre confirmation de prise en charge de la demande du client.\n\nBonne journée,",
+    "Message client": "Bonjour,\n\nNous relançons ce jour le vendeur  afin qu’il vous fournisse une solution pour réparer votre produit. Nous vous invitons à rester en contact avec votre vendeur directement depuis cette discussion.\n\nNous reviendrons vers vous  dans 48 h ouvres afin de valider la bonne prise en charge de votre demande.\n\nMerci pour votre compréhension,\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nLe client vous a signalé une panne sur son produit , et n'a pas obtenu de réponse de votre part. Nous vous rappelons votre obligation de répondre sous 48h à la demande de prise en charge.\n\nSi  vous n’apportez pas de réponse sous 24h , cette discussion sera passée en réclamation et vous vous exposerez à un  possible remboursement à vos frais de cette commande.\n\nNous vous remercions de votre réactivité et comptons sur votre confirmation de prise en charge de la demande du client.\n\nBonne journée,",
     "Action": "388 - MEA 1 jour",
     "Note": "En attente de la réponse du vendeur.\nEn attente de la prise en charge par le vendeur."
   },
@@ -76,11 +76,20 @@
     "Action": "             ",
     "Note": "                       "
   },
+ 
+
   {
-    "Raison": "clt ne repnd pas ",
-    "Message client": "Le client ne répond pas. Je l’ai invité à rester en contact avec le vendeur et à fournir les éléments demandés afin que sa demande puisse être traitée.\n",
-    "Message vendeur": "Bonjour,\n\nComme convenu, nous revenons sur ce dossier et notons que le client ne vous a pas  fourni  le produit / les éléments indispensables  pour établir un diagnostic  et procéder ensuite à la réparation .\n\nNous prenons contact avec le client  et lui signifions la clôture de ce dossier.\n\nBien sur, si le client fourni ces éléments en suivant, nous comptons sur vous pour une prise en charge efficace de sa demande.\n\nNous vous remercions de votre coopération\n\nCordialement,\n\nL'équipe Cdiscount",
-    "Action": "19 ",
-    "Note": "Le client ne répond pas. Je l’ai invité à rester en contact avec le vendeur et à fournir les éléments demandés afin que sa demande puisse être traitée.\n"
+    "Raison": "problème  résolu",
+    "Message client": "Bonjour,\n\nNous constatons que votre panne a bien été résolue.\nEn cas de nouveau problème, n’hésitez pas à contacter directement votre vendeur depuis cette discussion.\n\nMerci de votre compréhension.\n\nCordialement,\nL’équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nNous vous remercions pour la bonne prise en charge de la panne.\nCelle-ci étant désormais résolue, nous vous invitons à vous assurer de la satisfaction du client concernant votre intervention.\n\nCordialement,\n\nAbdelkrim\nL’équipe Cdiscoun",
+    "Action": "19",
+    "Note": "Le client signale que le problème a été résolu et refuse de retourner le produit."
+  },
+  {
+    "Raison": "clt ne repnd pas",
+    "Message client": "Bonjour,\n\nComme convenu, nous revenons sur ce dossier  et notons que vous n’êtes pas satisfait de la réponse apportée par le vendeur.\n\nCependant, vous n’avez, à ce jour, pas fourni  les éléments indispensables  au vendeur pour établir un diagnostic  et procéder ensuite à la réparation .\n\nNous clôturons donc le dossier et en informons le vendeur.\n\nBien sur, nous vous invitons à rester en contact avec votre vendeur directement depuis ce fil de discussion et avez, si besoin, la possibilité de nous re solliciter via le bouton “ demander l’intervention de Cdiscount”\n\nL'équipe Cdiscount",
+    "Message vendeur": "Bonjour,\n\nComme convenu, nous revenons sur ce dossier et notons que le client ne vous a pas  fourni les éléments indispensables  pour établir un diagnostic  et procéder ensuite à la réparation .\n\nNous prenons contact avec le client  et lui signifions la clôture de ce dossier.\n\nBien sur, si le client fourni ces éléments en suivant, nous comptons sur vous pour une prise en charge efficace de sa demande.\n\nNous vous remercions de votre coopération\n\nCordialement,\n\nL'équipe Cdiscount",
+    "Action": "19",
+    "Note": "Le client ne répond pas. Je l’ai invité à rester en contact avec le vendeur et à fournir les éléments demandés afin que sa demande puisse être traitée."
   }
 ]
