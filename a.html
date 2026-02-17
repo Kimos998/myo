@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Litiges Cdiscount</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 12px; background: #f8f9fa; }
+    .boutons { 
+      display: flex; flex-wrap: wrap; gap: 6px; margin: 15px 0; 
+    }
+    .btn { 
+      padding: 8px 14px; background: #e9f3ff; color: #0056b3; 
+      border: 1px solid #b3d4fc; border-radius: 5px; cursor: pointer; font-size: 13px;
+    }
+    .btn.actif { background: #0066cc; color: white; border-color: #0066cc; }
+    .cartes { 
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; 
+    }
+    .carte { 
+      background: white; border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden; 
+    }
+    .entete { 
+      background: #f1f3f5; padding: 10px 12px; font-weight: bold; 
+      display: flex; justify-content: space-between; align-items: center; 
+      border-bottom: 1px solid #dee2e6; font-size: 14px;
+    }
+    .btn-copier { 
+      background: #6c757d; color: white; border: none; padding: 5px 10px; 
+      border-radius: 4px; cursor: pointer; font-size: 12px;
+    }
+    .btn-copier:hover { background: #5a6268; }
+    .texte { 
+      padding: 12px; white-space: pre-wrap; font-family: Consolas, monospace; 
+      font-size: 13px; min-height: 110px; background: #fdfdfe;
+    }
+  </style>
+</head>
+<body>
+
+<div class="boutons" id="liste-boutons"></div>
+
+<div class="cartes">
+  <div class="carte">
+    <div class="entete">
+      Message pour le client
+      <button class="btn-copier" onclick="copier('client')">Copier</button>
+    </div>
+    <div class="texte" id="client"></div>
+  </div>
+
+  <div class="carte">
+    <div class="entete">
+      Message pour le vendeur
+      <button class="btn-copier" onclick="copier('vendeur')">Copier</button>
+    </div>
+    <div class="texte" id="vendeur"></div>
+  </div>
+
+  <div class="carte">
+    <div class="entete">
+      Action / Note
+      <button class="btn-copier" onclick="copier('action')">Copier</button>
+    </div>
+    <div class="texte" id="action"></div>
+  </div>
+</div>
+
+<script>
+const modeles = [
+  {
+    raison: "Réexpédition sans code tracking",
+    client: "Bonjour,\n\nLe vendeur indique avoir procédé à une réexpédition de votre commande.\nNous attendons désormais la transmission d’un numéro de suivi valide.\n\nLe vendeur dispose d’un délai de 2 jours pour communiquer ces informations dans cette discussion.\n\nVous pourrez les consulter directement depuis votre espace client.\n\nL’équipe Cdiscount",
+    vendeur: "Bonjour,\n\nVous indiquez avoir procédé à une réexpédition de cette commande.\nToutefois, les informations communiquées à ce stade ne permettent pas de confirmer correctement l’acheminement du colis (absence de numéro de suivi valide).\n\nAfin de pouvoir poursuivre le traitement du dossier, merci de nous transmettre sous 2 jours les informations complètes et conformes relatives à la réexpédition en cours (numéro de suivi valide, transporteur utilisé).\n\nMerci de regrouper en une seule réponse l’ensemble des informations et justificatifs demandés dans votre prochain message au client. À défaut de réponse complète, nous pourrons être amenés à procéder au remboursement de la commande.\n\nCordialement,\nAbdelkrim,\nL’équipe Cdiscount",
+    action: "MEA 2 j : 002\nEn attente d’information de suivi colis"
+  },
+  {
+    raison: "livre sans preuve",
+    client: "Bonjour,\nCertaines informations communiquées nécessitent d’être précisées.\nNous avons demandé au vendeur d’apporter une réponse conforme sous 1 jour, directement dans cette discussion.\n\nVous aurez accès à sa réponse dès sa publication.\n\nL’équipe Cdiscount",
+    vendeur: "Bonjour,\n\nle suivi du colis indique que le client a été livré, néanmoins aucune preuve de livraison n'a été transmise et le client indique ne pas avoir reçu le colis. Nous vous rappelons que vous avez 2 jours, à compter du (..), pour nous faire parvenir une preuve de livraison. A défaut, nous nous réservons le droit de procéder au remboursement de la commande, conformément à nos CGMAD. Pour rappel, une preuve de livraison valable doit :\n\nprovenir du transporteur utilisé.\n\nmentionner le nom du client et son adresse de livraison complète.\n\n\nindiquer la date de réception du colis par le client.\n\nCordialement, abdelkrim,\n\nL'équipe Cdiscount",
+    action: "MEA 1j : 388"
+  },
+  {
+    raison: "transmis de preuve de livraison",
+    client: "",
+    vendeur: "Bonjour,\n\nVous n’avez toujours pas transmis de preuve de livraison conforme pour confirmer la livraison. Nous vous rappelons que vous avez 7 jours, à compter du 11/02/2026, pour nous faire parvenir une preuve de livraison. A défaut, nous nous réservons le droit de procéder au remboursement de la commande, conformément à nos CGMAD.\n\nPour rappel, une preuve de livraison valable doit :\n\nProvenir du transporteur utilisé.\n\nMentionner le nom du client et son adresse de livraison complète.\n\nIndiquer la date de réception du colis par le client.\n\nCordialement,\n\nAbdelkrim, L'équipe Cdiscount",
+    action: ""
+  },
+  {
+    raison: "Aucune solution",
+    client: "",
+    vendeur: "Bonjour,\n\nAucune solution satisfaisante n’a été proposée au client. Nous procédons au remboursement total de la commande concernée à vos frais, conformément aux Conditions Générales de Mise à Disposition de la Marketplace.\n\nCordialement,\nAbdelkrim, L'équipe Cdiscount",
+    action: ""
+  },
+  {
+    raison: "Rexp ok lien ok",
+    client: "Bonjour,\n\nLe vendeur a effectué l'expédition annoncée dans le fil de discussion. Vous pouvez suivre la livraison avec le numéro de suivi indiqué dans le message du vendeur. Merci de votre compréhension,\n\nL'équipe Cdiscount",
+    vendeur: "Bonjour,\n\n\nVous avez fourni un numéro de suivi fonctionnel.\nNous informons le client qu'il recevra son colis rapidement.\nCordialement,\n\n\nAbdelkrim\nL'équipe Cdiscount",
+    action: "MEA 5j : 391 -- mail : 1399\nMise en attente pour s’assurer de la livraison de la commande"
+  }
+];
+
+const container = document.getElementById('liste-boutons');
+modeles.forEach((m, i) => {
+  const b = document.createElement('button');
+  b.className = 'btn';
+  b.textContent = m.raison;
+  b.onclick = () => afficher(i);
+  container.appendChild(b);
+});
+
+function afficher(index) {
+  const m = modeles[index];
+  document.getElementById('client').textContent = m.client || '(vide)';
+  document.getElementById('vendeur').textContent = m.vendeur || '(vide)';
+  document.getElementById('action').textContent = m.action || '(vide)';
+
+  document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('actif'));
+  document.querySelectorAll('.btn')[index].classList.add('actif');
+}
+
+function copier(id) {
+  const txt = document.getElementById(id).textContent.trim();
+  navigator.clipboard.writeText(txt).then(() => alert('Copié !'));
+}
+
+// Afficher le premier par défaut
+afficher(0);
+</script>
+
+</body>
+</html>
