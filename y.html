@@ -67,7 +67,7 @@
         }
         #note-area {
             width: 100%;
-            min-height: 140px;
+            min-height: 160px;
             padding: 12px;
             font-size: 1rem;
             border: 1px solid #ced4da;
@@ -147,15 +147,13 @@
                 <label>Numéro de dossier :</label>
                 <input type="text" id="num_dossier" placeholder="ex: 120856897">
             </div>
-
-            <!-- Nouvelle note supplémentaire pour "Cas en cours" -->
             <div class="note-extra" id="note-reclamation-passee">
                 <button class="copy-extra-btn" data-target="reclamation-passee">Copier</button>
                 <pre id="text-reclamation-passee">La réclamation a déjà été passée dans le dossier n° .</pre>
             </div>
         </div>
 
-        <!-- Section Remboursement (inchangée) -->
+        <!-- Section Remboursement -->
         <div id="remb_section">
             <div class="form-row">
                 <label>Genre :</label>
@@ -189,9 +187,13 @@
                 <input type="number" step="0.01" id="geste_montant" placeholder="ex: 20" style="width:100px; display:none;">
                 <span id="geste_unit" style="display:none;">€</span>
             </div>
+            <div class="form-row checkbox-group">
+                <input type="checkbox" id="refus_livraison">
+                <label for="refus_livraison">Conseiller de refuser la livraison</label>
+            </div>
         </div>
 
-        <!-- Section Email suivi livraison (inchangée) -->
+        <!-- Section Email suivi livraison -->
         <div id="suivi_section" style="display: none;">
             <div class="form-row">
                 <label>Genre :</label>
@@ -209,12 +211,10 @@
                 <label>Lien de suivi :</label>
                 <input type="text" id="lien_suivi" value="https://www.ship24.com/tracking?p=YT2601900709265037">
             </div>
-
             <div class="note-extra" id="note-info-livraison">
                 <button class="copy-extra-btn" data-target="info-livraison">Copier</button>
                 <pre id="text-info-livraison"></pre>
             </div>
-
             <div class="note-extra" id="note-attente">
                 <button class="copy-extra-btn" data-target="attente">Copier</button>
                 <pre id="text-attente"></pre>
@@ -243,11 +243,9 @@
         rembBtn.classList.toggle('active', mode === 'remboursement');
         encoursBtn.classList.toggle('active', mode === 'encours');
         suiviBtn.classList.toggle('active', mode === 'suivi');
-
         rembSection.style.display = mode === 'remboursement' ? 'block' : 'none';
         encoursSection.style.display = mode === 'encours' ? 'block' : 'none';
         suiviSection.style.display = mode === 'suivi' ? 'block' : 'none';
-
         updateNote();
     }
 
@@ -274,30 +272,29 @@
         const genreSelect = currentMode === 'suivi' ? document.getElementById('genre_suivi') : document.getElementById('genre');
         const genre = genreSelect ? genreSelect.value : 'inconnu';
         const isFemale = genre === 'femme';
-
         return {
             sujet: isFemale ? 'Cliente informée' : 'Client informé',
             pronom: isFemale ? 'la cliente' : 'le client',
             poss: isFemale ? 'sa' : 'son',
             part: isFemale ? 'occasionnée' : 'occasionné',
             accord: isFemale ? 'e' : '',
-            invite: isFemale ? 'invitée' : 'invité'
+            invite: isFemale ? 'invitée' : 'invité',
+            pronomSujet: isFemale ? 'elle' : 'il',
+            pronomSujetAccord: isFemale ? 'recontactée' : 'recontacté'
         };
     }
 
     function updateExtraNotes() {
         if (currentMode === 'suivi') {
             const g = getGenreInfo();
-            document.getElementById('text-info-livraison').textContent = 
+            document.getElementById('text-info-livraison').textContent =
                 `J’ai informé ${g.pronom} que le colis est marqué comme livré depuis le 04/02 et je l’ai ${g.invite} à confirmer la réception de ${g.poss} commande ou, le cas échéant, à contester la livraison.`;
-
-            document.getElementById('text-attente').textContent = 
+            document.getElementById('text-attente').textContent =
                 `Attendre la réponse de ${g.pronom}.`;
         } else if (currentMode === 'encours') {
             const num = (document.getElementById('num_dossier').value || '').trim();
-            const dossierText = num ? num : '';
-            document.getElementById('text-reclamation-passee').textContent = 
-                `La réclamation a déjà été passée dans le dossier n° ${dossierText}.`;
+            document.getElementById('text-reclamation-passee').textContent =
+                `La réclamation a déjà été passée dans le dossier n° ${num ? num : ''}.`;
         }
     }
 
@@ -314,11 +311,10 @@
         } else if (currentMode === 'suivi') {
             const produit = document.getElementById('produit').value.trim() || 'produit';
             const lien = document.getElementById('lien_suivi').value.trim() || '';
-
             text = `Bonjour,\n\nJe vous contacte aujourd’hui concernant la livraison du produit « ${produit} ».\nAprès vérification, la commande est indiquée comme livrée (${lien}).\n\nJe vous contacte donc afin de vous demander de bien vouloir confirmer la réception du produit.\n\nDans le cas contraire, nous effectuerons le nécessaire pour vous proposer une solution.\n\nMerci de bien vouloir nous confirmer la situation directement via cette discussion.\n\nJe reprendrai votre dossier dans deux jours afin de suivre l’avancement et de clôturer cette réclamation ou de mettre en place une solution adaptée.\n\nMerci de votre compréhension.\n\nCordialement,\nAbdelkrim\nL’équipe Cdiscount`;
-
             updateExtraNotes();
         } else {
+            // Remboursement validé
             const rawMontant = parseFloat(document.getElementById('montant').value) || 0;
             const montant = formatMontant(rawMontant);
             const reste = parseInt(document.getElementById('mensualites').value) || 0;
@@ -326,6 +322,7 @@
             const gesteOn = document.getElementById('geste').checked;
             const gesteRaw = gesteOn ? parseFloat(document.getElementById('geste_montant').value) || 0 : 0;
             const geste = formatMontant(gesteRaw);
+            const refusLivraison = document.getElementById('refus_livraison').checked;
 
             text = `${g.sujet} de ${g.poss} remboursement d'un montant de ${montant} euros qui sera visible sur son compte sous 3 à 5 jours ouvrés`;
 
@@ -335,8 +332,16 @@
             if (boa) parties.push("les bons d'achat ont également été réactivés");
             if (gesteOn && gesteRaw > 0) parties.push(`un geste commercial de ${geste} euros a été accordé ${g.pronom} suite à la gêne ${g.part}`);
 
-            if (parties.length > 0) text += " ; " + parties.join(" ; ") + ".";
-            else text += ".";
+            if (parties.length > 0) {
+                text += " ; " + parties.join(" ; ");
+            }
+
+            text += ".";
+
+            // Phrase refus livraison corrigée (s’ au lieu de si)
+            if (refusLivraison) {
+                text += ` Je lui ai conseillé de refuser la livraison s’${g.pronomSujet} est ${g.pronomSujetAccord} ultérieurement par le transporteur, afin d’éviter tout problème de paiement.`;
+            }
         }
 
         document.getElementById('note-area').value = text.trim();
@@ -365,10 +370,7 @@
     document.querySelectorAll('.copy-extra-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.getAttribute('data-target');
-            let textEl;
-            if (target === 'info-livraison') textEl = document.getElementById('text-info-livraison');
-            else if (target === 'attente') textEl = document.getElementById('text-attente');
-            else if (target === 'reclamation-passee') textEl = document.getElementById('text-reclamation-passee');
+            const textEl = document.getElementById(`text-${target}`);
             if (textEl) copyToClipboard(textEl.textContent.trim(), btn);
         });
     });
