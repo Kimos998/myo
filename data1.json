@@ -1,0 +1,23 @@
+[
+    {
+        "Raison": "Colis en cours de livraison",
+        "Message client": "Colis en cours de livraison. J’ai informé le client que j’ai relancé le vendeur pour proposer une solution.",
+        "Message vendeur": "Colis en retour. J’ai informé le client que j’ai relancé le vendeur concernant le remboursement.",
+        "Action": "Commande non expédiée. J’ai informé le client que j’ai relancé le vendeur afin qu’il envoie un lien de suivi valide ou propose une solution adaptée.",
+        "Note": "Commande perdue. J’ai informé le client que j’ai relancé le vendeur afin qu’il envoie un lien de suivi valide pour suivre la réexpédition."
+    },
+    {
+        "Raison": "2",
+        "Message client": "Colis livré. J’ai informé le client que j’ai relancé le vendeur afin qu’il fournisse une preuve de livraison ou propose une solution adaptée.",
+        "Message vendeur": "Colis livré. J’ai informé le client que j’ai transféré son dossier à notre équipe pour vérifier la preuve de livraison et je l’ai invité à patienter le temps du traitement.",
+        "Action": "J’ai informé le client que le colis est disponible en point relais depuis plus de 15 jours. J’ai relancé le vendeur pour vérifier l’état de la livraison du colis.",
+        "Note": "Réexpédition confirmée. J’ai informé le client que j’ai relancé le vendeur afin qu’il fournisse un lien de suivi valide pour suivre la livraison du nouvel envoi."
+    },
+    {
+        "Raison": "3",
+        "Message client": "Réexpédition confirmée. J ai informé le client que le vendeur a bien fourni un lien de suivi valide pour suivre la livraison du nouvel envoi. Aucune anomalie constatée jusqu à maintenant, je l ai invité à patienter jusqu à la livraison.",
+        "Message vendeur": "Colis absent au point relais. J’ai informé le client que j’ai relancé le vendeur afin qu’il propose une solution.",
+        "Action": "J’ai informé le client que son colis a bien été livré en point relais, et je l’ai invité à le récupérer ou à le refuser.",
+        "Note": ""
+    }
+]
