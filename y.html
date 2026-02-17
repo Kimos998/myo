@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Remboursement / En cours / Suivi Livraison</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            padding: 12px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            background: #e9ecef;
+            color: #212529;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .mode-btn:hover { background: #dee2e6; }
+        .mode-btn.active {
+            background: #ced4da;
+            border-color: #adb5bd;
+            font-weight: 500;
+        }
+        .form {
+            padding: 16px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .form-row label {
+            min-width: 140px;
+            font-weight: 500;
+        }
+        .form-row input, .form-row select, .form-row textarea {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        #note-area {
+            width: 100%;
+            min-height: 140px;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: monospace;
+            background: #fdfdfd;
+            margin-bottom: 16px;
+        }
+        .note-extra {
+            background: #f1f3f5;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 16px 0 8px;
+            position: relative;
+        }
+        .note-extra pre {
+            margin: 0 0 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+        .copy-extra-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .copy-extra-btn.copied {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .copy-container {
+            padding: 0 16px 16px;
+            text-align: right;
+        }
+        .copy-btn {
+            padding: 10px 20px;
+            background: #e9ecef;
+            color: #212529;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .copy-btn:hover { background: #dee2e6; }
+        .copy-btn.copied {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        @media (max-width: 600px) {
+            .mode-buttons { flex-direction: column; }
+            .form-row { flex-direction: column; align-items: stretch; }
+            .form-row label { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="mode-buttons">
+        <button class="mode-btn active" id="rembBtn">Remboursement validé</button>
+        <button class="mode-btn" id="encoursBtn">Cas en cours de traitement</button>
+        <button class="mode-btn" id="suiviBtn">Email suivi livraison</button>
+    </div>
+    <div class="form">
+        <!-- Section En cours -->
+        <div id="encours_section" style="display: none;">
+            <div class="form-row">
+                <label>Numéro de dossier :</label>
+                <input type="text" id="num_dossier" placeholder="ex: 120856897">
+            </div>
+
+            <!-- Nouvelle note supplémentaire pour "Cas en cours" -->
+            <div class="note-extra" id="note-reclamation-passee">
+                <button class="copy-extra-btn" data-target="reclamation-passee">Copier</button>
+                <pre id="text-reclamation-passee">La réclamation a déjà été passée dans le dossier n° .</pre>
+            </div>
+        </div>
+
+        <!-- Section Remboursement (inchangée) -->
+        <div id="remb_section">
+            <div class="form-row">
+                <label>Genre :</label>
+                <select id="genre">
+                    <option value="inconnu">Inconnu / Neutre</option>
+                    <option value="homme">Homme</option>
+                    <option value="femme">Femme</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Montant :</label>
+                <input type="number" step="0.01" id="montant" value="212">
+                <span> €</span>
+            </div>
+            <div class="form-row">
+                <label>Mensualités :</label>
+                <select id="mensualites">
+                    <option value="0">Aucune</option>
+                    <option value="1">1 restante</option>
+                    <option value="2">2 restantes</option>
+                    <option value="3">3 restantes</option>
+                </select>
+            </div>
+            <div class="form-row checkbox-group">
+                <input type="checkbox" id="boa">
+                <label for="boa">Réactiver BOA</label>
+            </div>
+            <div class="form-row checkbox-group">
+                <input type="checkbox" id="geste">
+                <label for="geste">Geste commercial</label>
+                <input type="number" step="0.01" id="geste_montant" placeholder="ex: 20" style="width:100px; display:none;">
+                <span id="geste_unit" style="display:none;">€</span>
+            </div>
+        </div>
+
+        <!-- Section Email suivi livraison (inchangée) -->
+        <div id="suivi_section" style="display: none;">
+            <div class="form-row">
+                <label>Genre :</label>
+                <select id="genre_suivi">
+                    <option value="inconnu">Inconnu / Neutre</option>
+                    <option value="homme">Homme</option>
+                    <option value="femme">Femme</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Nom du produit :</label>
+                <input type="text" id="produit" value="Poupée Reborn ZIYIUI en silicone de 55cm, réaliste et magnétique, pour enfants à partir de 3 ans">
+            </div>
+            <div class="form-row">
+                <label>Lien de suivi :</label>
+                <input type="text" id="lien_suivi" value="https://www.ship24.com/tracking?p=YT2601900709265037">
+            </div>
+
+            <div class="note-extra" id="note-info-livraison">
+                <button class="copy-extra-btn" data-target="info-livraison">Copier</button>
+                <pre id="text-info-livraison"></pre>
+            </div>
+
+            <div class="note-extra" id="note-attente">
+                <button class="copy-extra-btn" data-target="attente">Copier</button>
+                <pre id="text-attente"></pre>
+            </div>
+        </div>
+
+        <textarea id="note-area" readonly></textarea>
+        <div class="copy-container">
+            <button class="copy-btn" id="copyButton">Copier</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rembBtn = document.getElementById('rembBtn');
+    const encoursBtn = document.getElementById('encoursBtn');
+    const suiviBtn = document.getElementById('suiviBtn');
+    const rembSection = document.getElementById('remb_section');
+    const encoursSection = document.getElementById('encours_section');
+    const suiviSection = document.getElementById('suivi_section');
+    const copyBtn = document.getElementById('copyButton');
+    let currentMode = 'remboursement';
+
+    function setMode(mode) {
+        currentMode = mode;
+        rembBtn.classList.toggle('active', mode === 'remboursement');
+        encoursBtn.classList.toggle('active', mode === 'encours');
+        suiviBtn.classList.toggle('active', mode === 'suivi');
+
+        rembSection.style.display = mode === 'remboursement' ? 'block' : 'none';
+        encoursSection.style.display = mode === 'encours' ? 'block' : 'none';
+        suiviSection.style.display = mode === 'suivi' ? 'block' : 'none';
+
+        updateNote();
+    }
+
+    rembBtn.onclick = () => setMode('remboursement');
+    encoursBtn.onclick = () => setMode('encours');
+    suiviBtn.onclick = () => setMode('suivi');
+
+    document.getElementById('geste').onchange = () => {
+        const show = document.getElementById('geste').checked;
+        document.getElementById('geste_montant').style.display = show ? 'inline-block' : 'none';
+        document.getElementById('geste_unit').style.display = show ? 'inline' : 'none';
+        if (show && !document.getElementById('geste_montant').value) document.getElementById('geste_montant').value = '20';
+        updateNote();
+    };
+
+    function formatMontant(val) {
+        const num = Number(val);
+        if (isNaN(num) || num === 0) return '0';
+        if (Number.isInteger(num)) return num.toString();
+        return num.toFixed(2).replace('.', ',');
+    }
+
+    function getGenreInfo() {
+        const genreSelect = currentMode === 'suivi' ? document.getElementById('genre_suivi') : document.getElementById('genre');
+        const genre = genreSelect ? genreSelect.value : 'inconnu';
+        const isFemale = genre === 'femme';
+
+        return {
+            sujet: isFemale ? 'Cliente informée' : 'Client informé',
+            pronom: isFemale ? 'la cliente' : 'le client',
+            poss: isFemale ? 'sa' : 'son',
+            part: isFemale ? 'occasionnée' : 'occasionné',
+            accord: isFemale ? 'e' : '',
+            invite: isFemale ? 'invitée' : 'invité'
+        };
+    }
+
+    function updateExtraNotes() {
+        if (currentMode === 'suivi') {
+            const g = getGenreInfo();
+            document.getElementById('text-info-livraison').textContent = 
+                `J’ai informé ${g.pronom} que le colis est marqué comme livré depuis le 04/02 et je l’ai ${g.invite} à confirmer la réception de ${g.poss} commande ou, le cas échéant, à contester la livraison.`;
+
+            document.getElementById('text-attente').textContent = 
+                `Attendre la réponse de ${g.pronom}.`;
+        } else if (currentMode === 'encours') {
+            const num = (document.getElementById('num_dossier').value || '').trim();
+            const dossierText = num ? num : '';
+            document.getElementById('text-reclamation-passee').textContent = 
+                `La réclamation a déjà été passée dans le dossier n° ${dossierText}.`;
+        }
+    }
+
+    function updateNote() {
+        let text = '';
+        const g = getGenreInfo();
+
+        if (currentMode === 'encours') {
+            const num = (document.getElementById('num_dossier').value || '').trim();
+            text = "Cas déjà en cours de traitement sur le dossier N°";
+            if (num) text += " " + num;
+            text += ".";
+            updateExtraNotes();
+        } else if (currentMode === 'suivi') {
+            const produit = document.getElementById('produit').value.trim() || 'produit';
+            const lien = document.getElementById('lien_suivi').value.trim() || '';
+
+            text = `Bonjour,\n\nJe vous contacte aujourd’hui concernant la livraison du produit « ${produit} ».\nAprès vérification, la commande est indiquée comme livrée (${lien}).\n\nJe vous contacte donc afin de vous demander de bien vouloir confirmer la réception du produit.\n\nDans le cas contraire, nous effectuerons le nécessaire pour vous proposer une solution.\n\nMerci de bien vouloir nous confirmer la situation directement via cette discussion.\n\nJe reprendrai votre dossier dans deux jours afin de suivre l’avancement et de clôturer cette réclamation ou de mettre en place une solution adaptée.\n\nMerci de votre compréhension.\n\nCordialement,\nAbdelkrim\nL’équipe Cdiscount`;
+
+            updateExtraNotes();
+        } else {
+            const rawMontant = parseFloat(document.getElementById('montant').value) || 0;
+            const montant = formatMontant(rawMontant);
+            const reste = parseInt(document.getElementById('mensualites').value) || 0;
+            const boa = document.getElementById('boa').checked;
+            const gesteOn = document.getElementById('geste').checked;
+            const gesteRaw = gesteOn ? parseFloat(document.getElementById('geste_montant').value) || 0 : 0;
+            const geste = formatMontant(gesteRaw);
+
+            text = `${g.sujet} de ${g.poss} remboursement d'un montant de ${montant} euros qui sera visible sur son compte sous 3 à 5 jours ouvrés`;
+
+            const parties = [];
+            if (reste === 1) parties.push("la mensualité restante a été annulée");
+            else if (reste > 1) parties.push(`les ${reste} mensualités restantes ont été annulées`);
+            if (boa) parties.push("les bons d'achat ont également été réactivés");
+            if (gesteOn && gesteRaw > 0) parties.push(`un geste commercial de ${geste} euros a été accordé ${g.pronom} suite à la gêne ${g.part}`);
+
+            if (parties.length > 0) text += " ; " + parties.join(" ; ") + ".";
+            else text += ".";
+        }
+
+        document.getElementById('note-area').value = text.trim();
+    }
+
+    function copyToClipboard(text, btn) {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = 'Copié !';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = orig;
+                btn.classList.remove('copied');
+            }, 1400);
+        }).catch(() => {
+            btn.textContent = 'Erreur';
+            setTimeout(() => btn.textContent = 'Copier', 2000);
+        });
+    }
+
+    copyBtn.addEventListener('click', () => {
+        copyToClipboard(document.getElementById('note-area').value.trim(), copyBtn);
+    });
+
+    document.querySelectorAll('.copy-extra-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-target');
+            let textEl;
+            if (target === 'info-livraison') textEl = document.getElementById('text-info-livraison');
+            else if (target === 'attente') textEl = document.getElementById('text-attente');
+            else if (target === 'reclamation-passee') textEl = document.getElementById('text-reclamation-passee');
+            if (textEl) copyToClipboard(textEl.textContent.trim(), btn);
+        });
+    });
+
+    document.querySelectorAll('input, select, textarea').forEach(el => el.addEventListener('input', updateNote));
+    document.querySelectorAll('select, input[type="checkbox"]').forEach(el => el.addEventListener('change', updateNote));
+
+    // Initialisation
+    updateNote();
+    setMode('remboursement');
+</script>
+</body>
+</html>
